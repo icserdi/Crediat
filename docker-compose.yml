@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # Database with Vector support
+  db:
+    image: ankane/pgvector:v0.5.1
+    container_name: collections-db
+    restart: always
+    environment:
+      POSTGRES_DB: smart_collections
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - collections-network
+
+  # Cache and Message Queue
+  redis:
+    image: redis:7-alpine
+    container_name: collections-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - collections-network
+
+  # Object Storage (S3 Compatible)
+  minio:
+    image: minio/minio
+    container_name: collections-minio
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - collections-network
+
+  # Backend (Next.js Application)
+  app:
+    build: .
+    container_name: collections-app
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://admin:password123@db:5432/smart_collections
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadminpassword
+    depends_on:
+      - db
+      - redis
+      - minio
+    networks:
+      - collections-network
+
+networks:
+  collections-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

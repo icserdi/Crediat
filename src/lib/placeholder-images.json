@@ -1,0 +1,16 @@
+{
+  "placeholderImages": [
+    {
+      "id": "debtor-avatar",
+      "description": "Professional avatar for debtor profiles",
+      "imageUrl": "https://picsum.photos/seed/collections-1/200/200",
+      "imageHint": "profile avatar"
+    },
+    {
+      "id": "financial-report",
+      "description": "Iconographic representation of financial charts",
+      "imageUrl": "https://picsum.photos/seed/collections-2/800/400",
+      "imageHint": "financial data"
+    }
+  ]
+}

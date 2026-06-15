@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+set -e
+
+# Actualiza checkpoint local después de cada commit.
+npm run tracker:checkpoint
