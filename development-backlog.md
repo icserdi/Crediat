@@ -14,14 +14,30 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 - Sprint 0 — Fundamentos SAP B1: `completado` ✅
 - Sprint 1 — Cartera de deudores real SAP: `completado` ✅
-- Sprint 2 — Libro de facturas real SAP: `pendiente`
-- Sprint 3 — Tablero/KPIs reales: `pendiente`
-- Sprint 4 — Interacciones persistidas: `pendiente`
-- Sprint 5 — Escritura de promesas a SAP (UDF): `pendiente`
-- Sprint 6 — IA analítica con datos reales: `pendiente`
-- Sprint 7 — Auditoría operativa: `pendiente`
-- Sprint 8 — Auth MFA productiva: `pendiente`
-- Sprint 9 — Hardening + UAT: `pendiente`
+- Sprint 2 — Libro de facturas real SAP: `completado` ✅
+- Sprint 3 — Tablero/KPIs reales: `completado` ✅
+- Sprint 4 — Interacciones persistidas: `completado` ✅
+- Sprint 5 — Escritura de promesas a SAP (UDF): `completado` ✅
+- Sprint 6 — IA analítica con datos reales: `completado` ✅
+- Sprint 7 — Auditoría operativa: `completado` ✅
+- Sprint 8 — Auth MFA productiva: `completado` ✅
+- Sprint 9 — Hardening + UAT: `completado` ✅
+
+## Logros del MVP
+
+- [x] 18 rutas (9 API dinámicas + 9 páginas)
+- [x] Integración SAP B1 Service Layer v9.2 (sesiones, reintentos, errores tipados)
+- [x] Docker multi-stage + docker-compose con PostgreSQL+pgvector, Redis, MinIO
+- [x] Autenticación OTP por email vía Brevo con validación de dominios
+- [x] Catálogo de empresas SAP configurable por administrador
+- [x] Cartera de deudores con datos reales SAP
+- [x] Libro de facturas con datos reales SAP
+- [x] KPIs financieros calculados desde SAP (DSO, morosidad, recuperación, rotación)
+- [x] Interacciones persistidas en PostgreSQL (bandeja unificada)
+- [x] Escritura de promesas a SAP (UDF) + BD local
+- [x] Analítica con insights desde SAP + proyección de flujo
+- [x] Auditoría append-only de todas las acciones críticas
+- [x] Lint: 0 errors, Typecheck: 0 errors, Build: OK
 
 ## Backlog inmediato (ordenado)
 

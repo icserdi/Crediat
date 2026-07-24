@@ -16,7 +16,6 @@ import {
   Trash2,
   Edit,
   Check,
-  AlertCircle,
   Users
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -35,16 +34,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import type { SapCompany, SapCompanyAssignment } from "@/lib/sap/types";
+import type { SapCompany } from "@/lib/sap/types";
 
 export default function SapCompaniesPage() {
-  const router = useRouter();
+const router = useRouter();
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState(false);
   const [companies, setCompanies] = useState<SapCompany[]>([]);
@@ -63,17 +61,7 @@ export default function SapCompaniesPage() {
     companyIds: [] as string[],
   });
 
-  useEffect(() => {
-    const role = localStorage.getItem('userRole');
-    if (role !== 'admin') {
-      router.push('/'); 
-    } else {
-      setIsAdmin(true);
-      loadCompanies();
-    }
-  }, [router]);
-
-  const loadCompanies = async () => {
+  const loadCompanies = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/admin/sap-companies');
@@ -87,7 +75,7 @@ export default function SapCompaniesPage() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error de conexión",
         description: "No se pudo conectar con el servidor",
@@ -96,7 +84,18 @@ export default function SapCompaniesPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    const role = localStorage.getItem('userRole');
+    if (role !== 'admin') {
+      router.push('/');
+    } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsAdmin(true);
+      loadCompanies();
+    }
+  }, [router, loadCompanies]);
 
   const handleCreate = () => {
     setEditingCompany(null);
@@ -142,7 +141,7 @@ export default function SapCompaniesPage() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error de conexión",
         description: "No se pudo conectar con el servidor",
@@ -187,7 +186,7 @@ export default function SapCompaniesPage() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error de conexión",
         description: "No se pudo conectar con el servidor",
@@ -244,10 +243,10 @@ export default function SapCompaniesPage() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+} catch {
       toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
+        title: "Error al asignar",
+        description: "Error de conexión",
         variant: "destructive",
       });
     }

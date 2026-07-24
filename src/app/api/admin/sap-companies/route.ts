@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSapCompaniesStore } from '@/lib/sap/companies-store';
-import { type SapCompany } from '@/lib/sap/types';
 
 const createCompanySchema = z.object({
   companyDb: z.string().min(1, 'CompanyDB es requerido'),

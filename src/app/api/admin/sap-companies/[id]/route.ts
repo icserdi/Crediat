@@ -15,11 +15,12 @@ const updateCompanySchema = z.object({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const store = getSapCompaniesStore();
-    const company = store.getCompanyById(params.id);
+    const { id } = await params;
+    const company = store.getCompanyById(id);
 
     if (!company) {
       return NextResponse.json(
@@ -47,7 +48,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json();
@@ -57,7 +58,7 @@ export async function PATCH(
       return NextResponse.json(
         {
           error: 'VALIDATION_ERROR',
-          message: 'Datos inválidos',
+          message: 'Datos invĂˇlidos',
           details: parsed.error.flatten(),
         },
         { status: 400 }
@@ -65,7 +66,7 @@ export async function PATCH(
     }
 
     const store = getSapCompaniesStore();
-    const company = store.updateCompany(params.id, parsed.data);
+    const company = store.updateCompany((await params).id, parsed.data);
 
     if (!company) {
       return NextResponse.json(
@@ -99,11 +100,12 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const store = getSapCompaniesStore();
-    const deleted = store.deleteCompany(params.id);
+    const { id } = await params;
+    const deleted = store.deleteCompany(id);
 
     if (!deleted) {
       return NextResponse.json(

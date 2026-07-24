@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { SapBusinessPartnerDto } from "@/lib/sap/types";
 
@@ -50,21 +50,7 @@ export default function DebtorsPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const id = localStorage.getItem('activeCompanyId') || '';
-      if (id !== activeCompanyId) {
-        setActiveCompanyId(id);
-        loadDebtors(id);
-      }
-    };
-
-    handleStorageChange();
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [activeCompanyId]);
-
-  const loadDebtors = async (companyId?: string) => {
+  const loadDebtors = useCallback(async (companyId?: string) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -129,7 +115,7 @@ export default function DebtorsPage() {
           variant: "destructive",
         });
       }
-    } catch (err) {
+    } catch {
       setError('Error de conexión al servidor');
       toast({
         title: "Error de conexión",
@@ -139,7 +125,21 @@ export default function DebtorsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const id = localStorage.getItem('activeCompanyId') || '';
+      if (id !== activeCompanyId) {
+        setActiveCompanyId(id);
+        loadDebtors(id);
+      }
+    };
+
+    handleStorageChange();
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [activeCompanyId, loadDebtors]);
 
   const handleRefresh = () => {
     loadDebtors(activeCompanyId);

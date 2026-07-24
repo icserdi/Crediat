@@ -11,31 +11,99 @@ import {
   Users,
   Zap,
   TrendingUp,
-  History
+  RefreshCw,
+  AlertCircle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  AreaChart,
-  Area
-} from 'recharts';
+import { Button } from "@/components/ui/button";
+import { useState, useEffect, useCallback } from "react";
 
-const performanceData = [
-  { name: 'Jul', actual: 82000, projected: 85000 },
-  { name: 'Ago', actual: 95000, projected: 92000 },
-  { name: 'Sep', actual: 88000, projected: 98000 },
-  { name: 'Oct', actual: 110000, projected: 105000 },
-  { name: 'Nov', actual: 102000, projected: 115000 },
-  { name: 'Dic', actual: 125000, projected: 120000 },
-];
+type KpiData = {
+  dso: { value: number; description: string };
+  morosidad: { value: number; description: string };
+  recuperacion: { value: number; description: string };
+  rotacion: { value: number; description: string };
+  riesgo: { alto: number; medio: number; bajo: number };
+  totalAr: number;
+  totalDebtors: number;
+  openInvoices: number;
+  companyDb: string;
+};
 
 export default function Dashboard() {
+  const [data, setData] = useState<KpiData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeCompanyId, setActiveCompanyId] = useState('');
+
+  const loadKpis = useCallback(async (companyId?: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const params = new URLSearchParams();
+      if (companyId) params.append('companyId', companyId);
+
+      const response = await fetch(`/api/kpi?${params.toString()}`);
+      const result = await response.json();
+
+      if (response.ok) {
+        setData(result);
+      } else {
+        setError(result.message || 'Error al cargar KPIs');
+      }
+    } catch {
+      setError('Error de conexión al servidor');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const id = localStorage.getItem('activeCompanyId') || '';
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setActiveCompanyId(id);
+    if (id) loadKpis(id);
+    else setIsLoading(false);
+  }, [loadKpis]);
+
+  const handleRefresh = () => {
+    loadKpis(activeCompanyId);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-background text-foreground">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <RefreshCw className="w-8 h-8 text-primary animate-spin" />
+            <p className="text-muted-foreground font-medium">Calculando KPIs desde SAP...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-background text-foreground">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+            <p className="text-red-600 font-medium">{error}</p>
+            <Button onClick={handleRefresh} variant="outline" size="sm" className="gap-2">
+              <RefreshCw className="w-4 h-4" /> Reintentar
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
@@ -47,50 +115,45 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="outline" className="bg-white px-3 py-1.5 gap-2 text-xs font-semibold border-primary/20">
-              <Zap className="w-3.5 h-3.5 text-accent animate-pulse-slow" />
+              <Zap className="w-3.5 h-3.5 text-accent" />
               Estado IA: Sincronizado
             </Badge>
-            <Badge variant="outline" className="bg-white px-3 py-1.5 gap-2 text-xs font-semibold border-primary/20">
-              <History className="w-3.5 h-3.5 text-primary" />
-              Última Actividad: hace 12m
-            </Badge>
+            <Button onClick={handleRefresh} variant="outline" size="sm" className="gap-2">
+              <RefreshCw className="w-4 h-4" /> Recargar
+            </Button>
           </div>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <KPICard 
             title="DSO (plazo de cobro)" 
-            value="38.2" 
-            description="Días promedio venta → cobro" 
+            value={data?.dso.value.toFixed(1) || '-'} 
+            description={data?.dso.description || ''} 
             icon={CalendarClock}
-            trend={{ value: 4.2, isPositive: true }}
           />
           <KPICard 
             title="Tasa Morosidad" 
-            value="5.4%" 
-            description="Exposición riesgo crítico" 
+            value={data ? `${data.morosidad.value.toFixed(1)}%` : '-'} 
+            description={data?.morosidad.description || ''} 
             icon={ShieldAlert}
-            trend={{ value: 1.1, isPositive: true }}
           />
           <KPICard 
             title="Tasa Recuperación" 
-            value="91.8%" 
-            description="Eficiencia de cartera" 
+            value={data ? `${data.recuperacion.value.toFixed(1)}%` : '-'} 
+            description={data?.recuperacion.description || ''} 
             icon={HandCoins}
-            trend={{ value: 2.5, isPositive: true }}
           />
           <KPICard 
             title="Rotación Cartera" 
-            value="7.4x" 
-            description="Velocidad anual flujo" 
+            value={data ? `${data.rotacion.value.toFixed(1)}x` : '-'} 
+            description={data?.rotacion.description || ''} 
             icon={TrendingUp}
           />
           <KPICard 
             title="Cumplimiento Promesa" 
-            value="89%" 
-            description="Pagos concretados" 
+            value="--" 
+            description="Requiere escritura SAP (UDF)" 
             icon={ShieldCheck}
-            trend={{ value: 5.0, isPositive: true }}
           />
         </div>
 
@@ -100,41 +163,43 @@ export default function Dashboard() {
               <div>
                 <CardTitle className="font-headline text-xl flex items-center gap-2 text-primary">
                   <Banknote className="w-5 h-5 text-accent" />
-                  Cobranza Real vs Proyectada
+                  Resumen de Cartera
                 </CardTitle>
-                <CardDescription>Histórico vs pronósticos de cobranza a 30 días impulsados por IA.</CardDescription>
+                <CardDescription>Datos consolidados desde SAP B1.</CardDescription>
               </div>
-              <Badge className="bg-primary/5 text-primary border-primary/10">Horizonte 30D</Badge>
+              <Badge className="bg-primary/5 text-primary border-primary/10">Tiempo Real</Badge>
             </CardHeader>
-            <CardContent className="h-[350px] pt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={performanceData}>
-                  <defs>
-                    <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#353585" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#353585" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                  <XAxis 
-                    dataKey="name" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#888', fontSize: 12 }} 
-                  />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tickFormatter={(val) => `$${val/1000}k`}
-                    tick={{ fill: '#888', fontSize: 12 }}
-                  />
-                  <Tooltip 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                  />
-                  <Area type="monotone" dataKey="actual" stroke="#353585" strokeWidth={4} fillOpacity={1} fill="url(#colorActual)" />
-                  <Area type="monotone" dataKey="projected" stroke="#FA9319" strokeWidth={2} strokeDasharray="6 4" fill="transparent" />
-                </AreaChart>
-              </ResponsiveContainer>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="p-6 bg-muted/10 rounded-2xl border border-primary/5">
+                  <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Total AR</p>
+                  <p className="text-3xl font-headline font-bold text-primary mt-2">
+                    ${data?.totalAr.toLocaleString() || '-'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Cuentas por cobrar abiertas</p>
+                </div>
+                <div className="p-6 bg-muted/10 rounded-2xl border border-primary/5">
+                  <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Deudores</p>
+                  <p className="text-3xl font-headline font-bold text-primary mt-2">
+                    {data?.totalDebtors || '-'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Clientes activos en SAP</p>
+                </div>
+                <div className="p-6 bg-muted/10 rounded-2xl border border-primary/5">
+                  <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Facturas Abiertas</p>
+                  <p className="text-3xl font-headline font-bold text-primary mt-2">
+                    {data?.openInvoices || '-'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Documentos pendientes</p>
+                </div>
+                <div className="p-6 bg-muted/10 rounded-2xl border border-primary/5">
+                  <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Compañía SAP</p>
+                  <p className="text-3xl font-headline font-bold text-primary mt-2 text-lg">
+                    {data?.companyDb || '-'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Base de datos activa</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -148,9 +213,9 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="space-y-6">
               {[
-                { name: 'Riesgo Alto (Crítico)', value: 18, color: 'bg-red-500', score: 85 },
-                { name: 'Riesgo Medio (Alerta)', value: 42, color: 'bg-orange-500', score: 62 },
-                { name: 'Riesgo Bajo (Saludable)', value: 124, color: 'bg-green-500', score: 15 },
+                { name: 'Riesgo Alto (Crítico)', value: data?.riesgo.alto || 0, color: 'bg-red-500', score: Math.min(100, ((data?.riesgo.alto || 0) / Math.max(1, data?.totalDebtors || 1)) * 100) },
+                { name: 'Riesgo Medio (Alerta)', value: data?.riesgo.medio || 0, color: 'bg-orange-500', score: Math.min(100, ((data?.riesgo.medio || 0) / Math.max(1, data?.totalDebtors || 1)) * 100) },
+                { name: 'Riesgo Bajo (Saludable)', value: data?.riesgo.bajo || 0, color: 'bg-green-500', score: Math.min(100, ((data?.riesgo.bajo || 0) / Math.max(1, data?.totalDebtors || 1)) * 100) },
               ].map((segment) => (
                 <div key={segment.name} className="space-y-2">
                   <div className="flex justify-between items-end">
@@ -167,15 +232,21 @@ export default function Dashboard() {
                   <div className="p-3 bg-red-50 border border-red-100 rounded-lg flex gap-3">
                     <ShieldAlert className="w-5 h-5 text-red-600 shrink-0" />
                     <div>
-                      <p className="text-xs font-bold text-red-800">Initech Systems Riesgo 0.92</p>
-                      <p className="text-[10px] text-red-700">Inconsistencia detectada. IA sugiere WhatsApp firme inmediato.</p>
+                      <p className="text-xs font-bold text-red-800">
+                        {data?.riesgo.alto || 0} cuentas en riesgo crítico
+                      </p>
+                      <p className="text-[10px] text-red-700">Balance supera 80% del límite de crédito.</p>
                     </div>
                   </div>
                   <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex gap-3">
                     <Zap className="w-5 h-5 text-blue-600 shrink-0" />
                     <div>
-                      <p className="text-xs font-bold text-blue-800">Nueva Oportunidad Recuperación</p>
-                      <p className="text-[10px] text-blue-700">Massive Dynamic aceptó oferta incentivo. Probabilidad éxito: 85%.</p>
+                      <p className="text-xs font-bold text-blue-800">
+                        AR Total: ${data?.totalAr.toLocaleString() || '-'}
+                      </p>
+                      <p className="text-[10px] text-blue-700">
+                        DSO actual: {data?.dso.value.toFixed(1) || '-'} días.
+                      </p>
                     </div>
                   </div>
                 </div>

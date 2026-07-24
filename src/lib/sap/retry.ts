@@ -46,7 +46,8 @@ export function defaultShouldRetry(error: unknown): boolean {
       code === 'ECONNRESET' ||
       code === 'ECONNREFUSED' ||
       code === 'ETIMEDOUT' ||
-      code === 'ENOTFOUND'
+      code === 'ENOTFOUND' ||
+      /timeout/i.test(error.message)
     ) {
       return true;
     }

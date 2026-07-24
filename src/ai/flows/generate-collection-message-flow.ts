@@ -75,8 +75,8 @@ const llmManagerGenerateMessageTool = ai.defineTool(
     }),
   },
   async (input) => {
-    let modelToUse = 'googleai/gemini-2.5-flash';
-    let llmName = 'Gemini-2.5-Flash';
+    const modelToUse = 'googleai/gemini-2.5-flash';
+    const llmName = 'Gemini-2.5-Flash';
 
     const historyFormatted = input.debtorHistory.length > 0
       ? `\n--- Historial del Deudor ---\n` +

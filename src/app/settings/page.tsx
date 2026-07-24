@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { 
-  Database, 
   Cpu, 
   Save,
   Server,
@@ -62,13 +61,14 @@ export default function SettingsPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTestingSAP, setIsTestingSAP] = useState(false);
   const [activeCompanyId, setActiveCompanyId] = useState('comp-1');
-  const [companies, setCompanies] = useState(initialCompanies);
+  const [companies] = useState(initialCompanies);
 
   useEffect(() => {
     const role = localStorage.getItem('userRole');
     if (role !== 'admin') {
       router.push('/'); 
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAdmin(true);
     }
 

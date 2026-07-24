@@ -9,65 +9,91 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Zap, ShieldCheck, Mail, Lock, ArrowRight } from "lucide-react";
 
-const ALLOWED_DOMAINS = ["serdi.com.mx", "heliequiposindustriales.com", "merkaaceros.com"];
-
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
-  const [step, setStep] = useState(1); // 1: Email, 2: Code
+  const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-
-  const validateDomain = (email: string) => {
-    const domain = email.split("@")[1];
-    return ALLOWED_DOMAINS.includes(domain);
-  };
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateDomain(email)) {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setStep(2);
+        toast({
+          title: "Código enviado",
+          description: data.message || `Código enviado a ${email}`,
+        });
+      } else if (response.status === 403) {
+        toast({
+          title: "Dominio no autorizado",
+          description: "Solo se permiten correos de dominios corporativos autorizados.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: data.message || 'Error al enviar código',
+          variant: "destructive",
+        });
+      }
+    } catch {
       toast({
-        title: "Dominio no autorizado",
-        description: "Solo se permiten correos de dominios corporativos autorizados.",
+        title: "Error de conexión",
+        description: "No se pudo conectar con el servidor",
         variant: "destructive",
       });
-      return;
-    }
-
-    setIsLoading(true);
-    // Simulación de envío de correo
-    setTimeout(() => {
+    } finally {
       setIsLoading(false);
-      setStep(2);
-      toast({
-        title: "Código enviado",
-        description: `Se ha enviado un código de validación a ${email}`,
-      });
-    }, 1500);
+    }
   };
 
-  const handleVerifyCode = (e: React.FormEvent) => {
+  const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (code === "123456") { // Código simulado
-      // Asignar rol simulado según el correo para efectos de demo
-      let assignedRole = 'admin';
-      if (email.includes('supervisor')) assignedRole = 'supervisor';
-      if (email.includes('cobrador') || email.includes('ventas')) assignedRole = 'cobrador';
-      
-      localStorage.setItem('userRole', assignedRole);
+    setIsLoading(true);
 
-      toast({
-        title: "Acceso concedido",
-        description: `Iniciando sesión como ${assignedRole.toUpperCase()}...`,
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp: code }),
       });
-      router.push("/");
-    } else {
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('userRole', data.role);
+        localStorage.setItem('userEmail', data.email);
+        toast({
+          title: "Acceso concedido",
+          description: `Iniciando sesión como ${data.role.toUpperCase()}...`,
+        });
+        router.push("/");
+      } else {
+        toast({
+          title: "Código inválido",
+          description: data.message || "El código ingresado no es correcto.",
+          variant: "destructive",
+        });
+      }
+    } catch {
       toast({
-        title: "Código inválido",
-        description: "El código ingresado no es correcto.",
+        title: "Error de conexión",
+        description: "No se pudo conectar con el servidor",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -79,7 +105,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background text-foreground">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary shadow-2xl shadow-primary/20 mb-4">
@@ -117,14 +143,14 @@ export default function LoginPage() {
                       required
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground italic">Tip: usa 'supervisor@serdi.com.mx' para probar rol supervisor.</p>
+                  <p className="text-[10px] text-muted-foreground italic">Acceso restringido a dominios autorizados.</p>
                 </div>
                 <Button 
                   type="submit" 
                   className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold gap-2 shadow-xl shadow-primary/20"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Validando dominio..." : "Siguiente"}
+                  {isLoading ? "Enviando código..." : "Siguiente"}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </form>
@@ -137,7 +163,7 @@ export default function LoginPage() {
                     <Input 
                       id="code"
                       type="text" 
-                      placeholder="123456" 
+                      placeholder="000000" 
                       maxLength={6}
                       className="pl-10 h-12 rounded-xl bg-muted/20 border-primary/5 font-mono text-center tracking-[1em] text-lg focus:ring-accent"
                       value={code}
@@ -148,9 +174,10 @@ export default function LoginPage() {
                 </div>
                 <Button 
                   type="submit" 
+                  disabled={isLoading}
                   className="w-full h-12 rounded-xl bg-accent hover:bg-accent/90 font-bold gap-2 shadow-xl shadow-accent/20"
                 >
-                  Acceder
+                  {isLoading ? "Validando..." : "Acceder"}
                   <ShieldCheck className="w-4 h-4" />
                 </Button>
                 <button 
@@ -172,13 +199,13 @@ export default function LoginPage() {
             </button>
             <div className="flex items-center gap-2 text-[9px] text-muted-foreground uppercase font-black tracking-tighter">
               <ShieldCheck className="w-3 h-3 text-green-600" />
-              Acceso restringido a dominios autorizados
+              Brevo Email Transaccional
             </div>
           </CardFooter>
         </Card>
 
         <p className="text-center text-[10px] text-muted-foreground uppercase font-medium tracking-widest">
-          &copy; 2023 Recupera AI Pro. Todos los derechos reservados.
+          &copy; 2026 Recupera AI Pro. Todos los derechos reservados.
         </p>
       </div>
     </div>

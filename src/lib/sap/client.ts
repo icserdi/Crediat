@@ -12,6 +12,8 @@ import type {
   SapServiceLayerErrorBody,
 } from './types';
 
+const IDEMPOTENT_METHODS = new Set(['GET', 'PUT', 'DELETE']);
+
 let singletonClient: SapServiceLayerClient | null = null;
 
 export function getSapClient(): SapServiceLayerClient {
@@ -39,6 +41,20 @@ export class SapServiceLayerClient {
     const companyDb = this.sessions.resolveCompanyDb(options.companyDb);
     const maxAttempts = (options.maxRetries ?? this.config.maxRetries) + 1;
 
+    const method = options.method ?? 'GET';
+    const allowRetry = options.retryable ?? IDEMPOTENT_METHODS.has(method);
+    const retryOptions = allowRetry
+      ? {
+          maxAttempts,
+          baseDelayMs: this.config.retryBaseDelayMs,
+          shouldRetry: (error: unknown) => defaultShouldRetry(error),
+        }
+      : {
+          maxAttempts: 1,
+          baseDelayMs: this.config.retryBaseDelayMs,
+          shouldRetry: () => false,
+        };
+
     return withRetry(
       async (attempt) => {
         try {
@@ -54,11 +70,7 @@ export class SapServiceLayerClient {
           throw error;
         }
       },
-      {
-        maxAttempts,
-        baseDelayMs: this.config.retryBaseDelayMs,
-        shouldRetry: (error) => defaultShouldRetry(error),
-      }
+      retryOptions
     );
   }
 

@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Select, 
   SelectContent, 
@@ -50,19 +50,9 @@ export function Sidebar() {
   const [role, setRole] = useState<UserRole>('admin');
   const [activeCompanyId, setActiveCompanyId] = useState<string>('');
   const [userCompanies, setUserCompanies] = useState<CompanyOption[]>([]);
-  const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
 
-  useEffect(() => {
-    const savedRole = localStorage.getItem('userRole') as UserRole;
-    if (savedRole) setRole(savedRole);
-
-    loadUserCompanies();
-  }, []);
-
-  const loadUserCompanies = async () => {
+  const loadUserCompanies = useCallback(async () => {
     try {
-      setIsLoadingCompanies(true);
-      
       // Cargar todas las empresas SAP activas
       const response = await fetch('/api/admin/sap-companies');
       const data = await response.json();
@@ -107,10 +97,19 @@ export function Sidebar() {
       ];
       setUserCompanies(fallbackCompanies);
       setActiveCompanyId(fallbackCompanies[0].id);
-    } finally {
-      setIsLoadingCompanies(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const savedRole = localStorage.getItem('userRole') as UserRole;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (savedRole) setRole(savedRole);
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadUserCompanies();
+  }, [loadUserCompanies]);
 
   const handleCompanyChange = (id: string) => {
     setActiveCompanyId(id);

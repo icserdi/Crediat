@@ -14,7 +14,7 @@ const setAssignmentSchema = z.object({
  */
 export async function GET() {
   try {
-    const store = getSapCompaniesStore();
+    getSapCompaniesStore();
     // Por ahora, el store no tiene un método para listar todas las asignaciones
     // Implementaremos esto más adelante cuando tengamos una base de datos real
     return NextResponse.json({

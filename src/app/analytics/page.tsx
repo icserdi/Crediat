@@ -16,57 +16,127 @@ import {
 import { 
   TrendingUp, 
   BrainCircuit, 
-  ArrowUpRight, 
-  ArrowDownRight,
-  ShieldCheck,
-  Zap
+  ArrowUpRight,
+  Zap,
+  RefreshCw,
+  AlertCircle,
+  Building2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { useState, useEffect, useCallback } from "react";
 
-const performanceData = [
-  { month: 'Jul', recovery: 85, morbidity: 12 },
-  { month: 'Ago', recovery: 88, morbidity: 10 },
-  { month: 'Sep', recovery: 82, morbidity: 15 },
-  { month: 'Oct', recovery: 91, morbidity: 8 },
-  { month: 'Nov', recovery: 89, morbidity: 9 },
-  { month: 'Dic', recovery: 94, morbidity: 6 },
-];
-
-const cashFlowData = [
-  { day: 'D+1', actual: 4000, projected: 4500 },
-  { day: 'D+3', actual: 6000, projected: 5800 },
-  { day: 'D+5', actual: 12000, projected: 11000 },
-  { day: 'D+7', actual: 8000, projected: 9500 },
-  { day: 'D+10', actual: 15000, projected: 16200 },
-  { day: 'D+14', projected: 22000 },
-  { day: 'D+21', projected: 18500 },
-  { day: 'D+30', projected: 31000 },
-];
+type AnalyticsData = {
+  kpi: {
+    morosidad: number;
+    recuperacion: number;
+    rotacion: number;
+  };
+  cashFlowProjection: {
+    day: string;
+    actual: number;
+    projected: number;
+  }[];
+  monthlyTrend: {
+    month: string;
+    recovery: number;
+    morbidity: number;
+  }[];
+  insights: {
+    title: string;
+    description: string;
+    type: 'info' | 'warning' | 'success';
+  }[];
+  totalDebtors: number;
+  totalAr: number;
+  asOf: string;
+};
 
 export default function AnalyticsPage() {
+  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadAnalytics = useCallback(async (companyId?: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const params = new URLSearchParams();
+      if (companyId) params.append('companyId', companyId);
+      const response = await fetch(`/api/analytics/data?${params.toString()}`);
+      const result = await response.json();
+      if (response.ok) setData(result);
+      else setError(result.message || 'Error al cargar analítica');
+    } catch {
+      setError('Error de conexión al servidor');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const id = localStorage.getItem('activeCompanyId') || '';
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (id) loadAnalytics(id);
+    else setIsLoading(false);
+  }, [loadAnalytics]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen bg-background">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <RefreshCw className="w-8 h-8 text-primary animate-spin" />
+            <p className="text-muted-foreground font-medium">Procesando analítica desde SAP...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-background">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+            <p className="text-red-600 font-medium">{error}</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
-      <main className="flex-1 p-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+        <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
-            <h2 className="text-3xl font-headline font-bold text-primary">Inteligencia y Pronósticos</h2>
-            <p className="text-muted-foreground">Perspectivas profundas de ciclos de cobro y seguridad de ingresos.</p>
+            <h2 className="text-4xl font-headline font-bold text-primary">Analítica e Inteligencia</h2>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Building2 className="w-4 h-4" />
+              <p className="text-lg">Perspectivas profundas de ciclos de cobro basadas en datos SAP.</p>
+            </div>
           </div>
-          <Badge className="bg-primary py-2 px-4 gap-2">
-            <Zap className="w-4 h-4 text-accent" />
-            Estado Entrenamiento IA: Optimizado
-          </Badge>
-        </div>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="bg-white px-3 py-1.5 gap-2 text-xs font-semibold border-primary/20">
+              <Zap className="w-3.5 h-3.5 text-accent" />
+              Datos al {data?.asOf ? new Date(data.asOf).toLocaleDateString() : '-'}
+            </Badge>
+          </div>
+        </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-2">
               <CardDescription className="text-xs uppercase font-bold">Tasa Morosidad</CardDescription>
               <CardTitle className="text-2xl font-headline flex items-baseline gap-2">
-                6.2%
-                <span className="text-xs text-green-600 flex items-center">
-                  <ArrowDownRight className="w-3 h-3" /> -1.4%
+                {data?.kpi.morosidad.toFixed(1)}%
+                <span className="text-xs text-muted-foreground">
+                  {data?.totalDebtors || 0} deudores
                 </span>
               </CardTitle>
             </CardHeader>
@@ -75,30 +145,19 @@ export default function AnalyticsPage() {
             <CardHeader className="pb-2">
               <CardDescription className="text-xs uppercase font-bold">Eficiencia Recuperación</CardDescription>
               <CardTitle className="text-2xl font-headline flex items-baseline gap-2">
-                94.8%
+                {data?.kpi.recuperacion.toFixed(1)}%
                 <span className="text-xs text-green-600 flex items-center">
-                  <ArrowUpRight className="w-3 h-3" /> +2.1%
+                  <ArrowUpRight className="w-3 h-3" /> Cartera
                 </span>
               </CardTitle>
             </CardHeader>
           </Card>
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-2">
-              <CardDescription className="text-xs uppercase font-bold">Rotación Portafolio</CardDescription>
+              <CardDescription className="text-xs uppercase font-bold">Rotación Cartera</CardDescription>
               <CardTitle className="text-2xl font-headline flex items-baseline gap-2">
-                8.4x
-                <span className="text-xs text-muted-foreground">Estable</span>
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card className="border-none shadow-sm">
-            <CardHeader className="pb-2">
-              <CardDescription className="text-xs uppercase font-bold">Cumplimiento Promesa</CardDescription>
-              <CardTitle className="text-2xl font-headline flex items-baseline gap-2">
-                92%
-                <span className="text-xs text-green-600 flex items-center">
-                  <ArrowUpRight className="w-3 h-3" /> +5%
-                </span>
+                {data?.kpi.rotacion.toFixed(1)}x
+                <span className="text-xs text-muted-foreground">Anual</span>
               </CardTitle>
             </CardHeader>
           </Card>
@@ -113,14 +172,14 @@ export default function AnalyticsPage() {
                     <TrendingUp className="w-5 h-5 text-accent" />
                     Proyección Flujo IA (30 Días)
                   </CardTitle>
-                  <CardDescription>Cobranza estimada basada en vectores de comportamiento histórico.</CardDescription>
+                  <CardDescription>Estimación basada en datos de SAP.</CardDescription>
                 </div>
                 <Badge variant="outline" className="border-accent text-accent">Confianza: 89%</Badge>
               </div>
             </CardHeader>
             <CardContent className="h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={cashFlowData}>
+                <AreaChart data={data?.cashFlowProjection || []}>
                   <defs>
                     <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#353585" stopOpacity={0.1}/>
@@ -148,36 +207,38 @@ export default function AnalyticsPage() {
                 <BrainCircuit className="w-5 h-5 text-primary" />
                 Insights Estratégicos
               </CardTitle>
-              <CardDescription>Hallazgos clave del último ciclo de entrenamiento.</CardDescription>
+              <CardDescription>Basados en datos SAP al {data?.asOf ? new Date(data.asOf).toLocaleDateString() : '-'}.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="p-4 bg-primary/5 rounded-lg border border-primary/10">
-                <h5 className="font-semibold text-primary mb-1 flex items-center gap-2">
-                   <ShieldCheck className="w-4 h-4" /> 
-                   Canal Óptimo
-                </h5>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  WhatsApp enviados entre 9:00 AM y 11:00 AM tienen una tasa de respuesta 35% mayor que email.
-                </p>
-              </div>
-              <div className="p-4 bg-orange-50 rounded-lg border border-orange-100">
-                <h5 className="font-semibold text-orange-800 mb-1 flex items-center gap-2">
-                   <TrendingUp className="w-4 h-4" /> 
-                   Alerta de Abandono
-                </h5>
-                <p className="text-sm text-orange-700 leading-relaxed">
-                  3 deudores de alto valor muestran baja en cumplimiento. IA sugiere intervención manual inmediata.
-                </p>
-              </div>
-              <div className="space-y-4 pt-4 border-t">
-                 <h5 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Composición de Recuperación</h5>
-                 <ResponsiveContainer width="100%" height={150}>
-                   <BarChart data={performanceData.slice(-3)}>
+              {data?.insights.map((insight, i) => (
+                <div key={i} className={cn(
+                  "p-4 rounded-lg border",
+                  insight.type === 'warning' ? 'bg-orange-50 border-orange-100' :
+                  insight.type === 'success' ? 'bg-green-50 border-green-100' :
+                  'bg-primary/5 border-primary/10'
+                )}>
+                  <h5 className="font-semibold text-primary mb-1 flex items-center gap-2 text-sm">
+                    {insight.title}
+                  </h5>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {insight.description}
+                  </p>
+                </div>
+              ))}
+
+              {data?.monthlyTrend && data.monthlyTrend.length > 0 && (
+                <div className="space-y-4 pt-4 border-t">
+                  <h5 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                    Recuperación (últimos meses)
+                  </h5>
+                  <ResponsiveContainer width="100%" height={150}>
+                    <BarChart data={data.monthlyTrend}>
                       <XAxis dataKey="month" hide />
                       <Bar dataKey="recovery" fill="#353585" radius={[4, 4, 0, 0]} />
-                   </BarChart>
-                 </ResponsiveContainer>
-              </div>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

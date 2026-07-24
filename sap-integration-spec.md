@@ -28,12 +28,16 @@ Esta especificación detalla los requerimientos de datos para la API intermedia 
 
 ### Datos Requeridos de SAP (GET):
 - `DocEntry` / `DocNum`: Identificadores de la factura.
-- `CardCode`: Relación con el deudor.
+- `CardCode` / `CardName`: Relación con el deudor.
 - `DocDate`: Fecha de emisión.
 - `DocDueDate`: Fecha de vencimiento.
 - `DocTotal`: Monto total de la factura.
-- `PaidToDate`: Monto ya pagado (para calcular saldo pendiente).
-- `DocCur`: Moneda (MXN/USD).
+- `DocCurrency`: Moneda (MXN/USD) — no `DocCur`.
+- `DocumentStatus`: Estado (`bost_Open`, `bost_Close`, `bost_Delivered`).
+
+### Notas:
+- No existe el campo `PaidToDate` en el endpoint `Invoices` de Service Layer v9.2. El saldo pendiente se calcula contrastando con `IncomingPayments`.
+- El filtro por defecto es `DocumentStatus eq 'bost_Open'` (facturas abiertas/pendientes).
 
 ---
 

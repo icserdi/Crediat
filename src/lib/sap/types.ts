@@ -48,11 +48,14 @@ export type SapInvoiceDto = {
   DocEntry: number;
   DocNum: number;
   CardCode: string;
+  CardName: string;
   DocDate: string;
   DocDueDate: string;
   DocTotal: number;
-  PaidToDate?: number;
-  DocCur: string;
+  DocCurrency: string;
+  DocumentStatus: 'bost_Open' | 'bost_Close' | 'bost_Delivered';
+  DocTotalFc?: number;
+  DocTotalSys?: number;
 };
 
 /** Campos UDF para escritura de promesas/gestiones. */
@@ -82,6 +85,8 @@ export type SapRequestOptions = {
   headers?: Record<string, string>;
   /** Sobrescribe reintentos del cliente para esta llamada. */
   maxRetries?: number;
+  /** Permite reintentos en llamadas no idempotentes cuando el caller lo garantiza. */
+  retryable?: boolean;
 };
 
 export type SapHealthResult = {

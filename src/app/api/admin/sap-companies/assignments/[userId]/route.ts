@@ -7,11 +7,12 @@ import { getSapCompaniesStore } from '@/lib/sap/companies-store';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const store = getSapCompaniesStore();
-    const assignment = store.getUserAssignment(params.userId);
+    const { userId } = await params;
+    const assignment = store.getUserAssignment(userId);
 
     if (!assignment) {
       return NextResponse.json(
@@ -39,11 +40,12 @@ export async function GET(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const store = getSapCompaniesStore();
-    const deleted = store.deleteUserAssignment(params.userId);
+    const { userId } = await params;
+    const deleted = store.deleteUserAssignment(userId);
 
     if (!deleted) {
       return NextResponse.json(
