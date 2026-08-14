@@ -61,8 +61,20 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 - [ ] Brevo: email transaccional (OTP, recuperación, notificaciones) + WhatsApp transaccional.
 - [ ] n8n autohospedado (opcional): automatizaciones de seguimiento/escalación.
-- [ ] Estrategia de repos: Gitea (desarrollo principal) y GitHub (release productivo validado).
-- [ ] Activar hooks locales cuando exista repo Git en la ruta: `npm run hooks:install`.
 - [ ] TEST/Staging local: Coolify.
 - [ ] PROD local: Dokploy.
+- [x] Estrategia de repos: Gitea (desarrollo principal) y GitHub (release productivo validado).
 - [x] Docker local funcional: `docker compose up -d --build`
+
+## Post-MVP — Funcionalidades a evaluar
+
+### Validación de RFC (para módulo de crédito)
+No implementada porque la validación fiscal se realiza en sucursal/punto de venta antes del registro del cliente. Queda como referencia para futura integración:
+
+| API | URL | Descripción |
+|-----|-----|-------------|
+| CS Facturación | https://developers.csfacturacion.com/verifica-rfc | Validación de RFC + estatus fiscal |
+| Origoid | https://origoid.com | Validación de identidad y RFC |
+| API Market | https://apimarket.mx/ | Marketplace de APIs, incluye validación SAT |
+| SAT Go | https://sat-go.com/informacion-fiscal-rfc | Consulta de información fiscal |
+| Facturo por Ti | https://developers.facturoporti.com.mx/reference/validar-listas-negras-efos-sat | Validación contra listas negras EFOS/SAT |

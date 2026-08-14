@@ -1,6 +1,6 @@
-# Especificación Técnica: Integración Recupera AI Pro <> SAP Business One (HANA v9.2)
+# Especificación Técnica: Integración Crediat <> SAP Business One (HANA v9.2)
 
-Esta especificación detalla los requerimientos de datos para la API intermedia que conectará la Service Layer de SAP B1 con el sistema Recupera AI Pro.
+Esta especificación detalla los requerimientos de datos para la API intermedia que conectará la Service Layer de SAP B1 con el sistema Crediat.
 
 **Actualizado Jun 2026** — Campos corregidos según respuesta real de Service Layer v9.2.
 
@@ -44,10 +44,10 @@ Esta especificación detalla los requerimientos de datos para la API intermedia 
 ## 3. Endpoint: Registro de Promesas/Pagos (POST/PATCH)
 **Propósito:** Notificar a SAP sobre gestiones realizadas o reportar pagos identificados.
 
-### Datos a enviar desde Recupera AI Pro:
-- `U_AI_LastContact`: Fecha de última gestión IA.
-- `U_AI_RiskScore`: Score de riesgo calculado por la IA.
-- `U_AI_PaymentPromise`: Fecha de promesa de pago acordada.
+### Datos a enviar desde la app:
+- `U_Cred_LastContact`: Fecha de última gestión de crédito.
+- `U_Cred_RiskScore`: Score de riesgo calculado por la IA.
+- `U_Cred_PaymentPromise`: Fecha de promesa de pago acordada.
 
 ---
 

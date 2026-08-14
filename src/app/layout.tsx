@@ -15,7 +15,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'Recupera AI Pro | Central de Cobranza Inteligente',
+  title: 'Crediat | Gestión Inteligente de Crédito y Cobranza',
   description: 'Sistema automatizado de gestión de cobranza con estrategia de IA integrada y analítica predictiva.',
 };
 

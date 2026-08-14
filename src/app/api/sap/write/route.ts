@@ -55,13 +55,13 @@ export async function POST(request: NextRequest) {
     const patchBody: Record<string, unknown> = {};
 
     if (data.paymentPromise) {
-      patchBody.U_AI_PaymentPromise = data.paymentPromise;
+      patchBody.U_Cred_PaymentPromise = data.paymentPromise;
     }
     if (data.lastContact) {
-      patchBody.U_AI_LastContact = data.lastContact;
+      patchBody.U_Cred_LastContact = data.lastContact;
     }
     if (data.riskScore !== undefined) {
-      patchBody.U_AI_RiskScore = data.riskScore;
+      patchBody.U_Cred_RiskScore = data.riskScore;
     }
 
     // Intentar PATCH en SAP
@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       // Si el error es por UDF inexistente, no es bloqueante
-      if (msg.includes('U_AI') || msg.includes('Invalid query')) {
-        sapResult = { ok: false, udfError: 'Los campos U_AI_* no existen en SAP. Deben crearse en SAP Business One antes de escribir.' };
+      if (msg.includes('U_Cred_') || msg.includes('Invalid query')) {
+        sapResult = { ok: false, udfError: 'Los campos U_Cred_* no existen en SAP. Deben crearse en SAP Business One antes de escribir.' };
       } else {
         throw err;
       }
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
       entityId: cardCode,
       description: sapResult.ok
         ? `Escritura UDF exitosa: ${type} - ${JSON.stringify(data)}`
-        : `Intento de escritura UDF: ${type}. Los campos U_AI_* no existen en SAP.`,
+        : `Intento de escritura UDF: ${type}. Los campos U_Cred_* no existen en SAP.`,
       metadata: { type, ...data, sapWritten: sapResult.ok },
       companyDb,
     });
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
       udfError: sapResult.udfError,
       message: sapResult.ok
         ? 'Datos escritos en SAP correctamente'
-        : 'Interacción registrada en BD local. La escritura en SAP requiere crear los campos U_AI_* en SAP Business One.',
+        : 'Interacción registrada en BD local. La escritura en SAP requiere crear los campos U_Cred_* en SAP Business One.',
     });
   } catch (error) {
     if (isSapServiceLayerError(error)) {

@@ -60,9 +60,9 @@ export type SapInvoiceDto = {
 
 /** Campos UDF para escritura de promesas/gestiones. */
 export type SapAiUdfPatch = {
-  U_AI_LastContact?: string;
-  U_AI_RiskScore?: number;
-  U_AI_PaymentPromise?: string;
+  U_Cred_LastContact?: string;
+  U_Cred_RiskScore?: number;
+  U_Cred_PaymentPromise?: string;
 };
 
 export type SapSessionCookies = {

@@ -1,8 +1,8 @@
 import { logAuditEvent } from '@/lib/db';
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
-const FROM_EMAIL = process.env.BREVO_FROM_EMAIL || 'noreply@recupera-ai-pro.com';
-const FROM_NAME = process.env.BREVO_FROM_NAME || 'Recupera AI Pro';
+const FROM_EMAIL = process.env.BREVO_FROM_EMAIL || 'noreply@crediat.app';
+const FROM_NAME = process.env.BREVO_FROM_NAME || 'Crediat';
 
 export async function sendOtpEmail(email: string, otp: string): Promise<boolean> {
   if (!BREVO_API_KEY) {
@@ -20,11 +20,11 @@ export async function sendOtpEmail(email: string, otp: string): Promise<boolean>
       body: JSON.stringify({
         sender: { name: FROM_NAME, email: FROM_EMAIL },
         to: [{ email }],
-        subject: `Código de Validación — Recupera AI Pro`,
+        subject: `Código de Validación — Crediat`,
         htmlContent: `
           <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
             <div style="background: #353585; padding: 24px; text-align: center; border-radius: 12px 12px 0 0;">
-              <h1 style="color: #FA9319; margin: 0; font-size: 20px;">Recupera AI Pro</h1>
+              <h1 style="color: #FA9319; margin: 0; font-size: 20px;">Crediat</h1>
             </div>
             <div style="background: #fff; padding: 32px; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px;">
               <h2 style="color: #353585; margin-top: 0;">Código de Validación</h2>

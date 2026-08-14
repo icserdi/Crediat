@@ -111,8 +111,8 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary shadow-2xl shadow-primary/20 mb-4">
             <Zap className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-4xl font-headline font-bold text-primary">Recupera AI Pro</h1>
-          <p className="text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Central de Cobranza Inteligente</p>
+          <h1 className="text-4xl font-headline font-bold text-primary">Crediat</h1>
+          <p className="text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Gestión Inteligente de Crédito y Cobranza</p>
         </div>
 
         <Card className="border-none shadow-2xl rounded-3xl overflow-hidden">
@@ -205,7 +205,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="text-center text-[10px] text-muted-foreground uppercase font-medium tracking-widest">
-          &copy; 2026 Recupera AI Pro. Todos los derechos reservados.
+          &copy; 2026 Crediat. Todos los derechos reservados.
         </p>
       </div>
     </div>

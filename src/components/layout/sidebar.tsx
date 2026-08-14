@@ -143,7 +143,7 @@ export function Sidebar() {
             <Zap className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-headline font-bold leading-tight">Recupera AI Pro</h1>
+            <h1 className="text-xl font-headline font-bold leading-tight">Crediat</h1>
             <span className="text-[10px] uppercase tracking-widest font-black text-accent/80">
               {role === 'admin' ? 'Administrador' : role === 'supervisor' ? 'Supervisor' : 'Cobrador'}
             </span>

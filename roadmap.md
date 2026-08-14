@@ -1,4 +1,4 @@
-# Roadmap Recupera AI Pro — hacia el MVP
+# Roadmap Crediat — hacia el MVP
 
 Este documento define **sprints** orientados a un **MVP** usable en producción: cobranza con datos confiables, trazabilidad mínima y base para IA. La prioridad acordada es **alimentar cada módulo con datos reales desde SAP Business One** (vía capa intermedia alineada a `sap-integration-spec.md`).
 

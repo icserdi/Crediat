@@ -1,4 +1,4 @@
-# Recupera AI Pro: Central de Cobranza Inteligente
+# Crediat: Gestión Inteligente de Crédito y Cobranza
 
 Sistema de Gestión de Cobranza con IA para la recuperación de cartera de alto rendimiento.
 
