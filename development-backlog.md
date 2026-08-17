@@ -3,7 +3,7 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-08-17T07:28:34.834Z
+- Última validación automática: 2026-08-17T16:14:17.262Z
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
@@ -81,7 +81,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 ### Seguridad y secretos
 - [x] Eliminar credenciales hardcodeadas de `docker-compose.yml` (`password123`, `minioadminpassword`) y moverlas a variables de entorno / secrets.
-- [ ] Revisar y mitigar vulnerabilidades reportadas por `npm audit` (67: 52 moderadas, 15 altas).
+- [x] Revisar y mitigar vulnerabilidades reportadas por `npm audit` (67 → 62: 52 moderadas, 10 altas). Las restantes provienen de dependencias transitivas opcionales de genkit (OpenTelemetry, @google-cloud/*, firebase-admin) sin fix disponible; no se usan directamente y se re-evaluarán con la próxima actualización de genkit.
 - [ ] Evaluar gestor de secretos para producción (no exponer `.env` ni claves en el repo).
 
 ### Pruebas
