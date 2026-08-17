@@ -3,11 +3,11 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-06-15T23:35:00.000Z
+- Última validación automática: 2026-08-17T06:00:07.863Z
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
-- Próximo paso sugerido: crear endpoint de facturas y poblar módulo `/invoices` con datos reales de SAP.
+- Próximo paso sugerido: continuar Sprint 0: conector SAP B1, catálogo de empresas y reglas de acceso por usuario.
 <!-- AUTO:NEXT_STEP_END -->
 
 ## Estado por sprint (vs roadmap)
@@ -69,8 +69,8 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 ## Mejores prácticas de desarrollo — pendiente
 
 ### CI/CD e integración continua
-- [ ] Crear pipeline de GitHub Actions (`.github/workflows/ci.yml`) que corra en cada push/PR: `npm ci` → `lint` → `typecheck` → `test` → `build`.
-- [ ] Configurar branch protection en `main` (requerir PRs, checks obligatorios, sin push directo).
+- [x] Crear pipeline de GitHub Actions (`.github/workflows/ci.yml`) que corra en cada push/PR: `npm ci` → `lint` → `typecheck` → `test` → `build`.
+- [ ] Configurar branch protection en `main` (requerir PRs, checks obligatorios, sin push directo). **Pausado 2026-08-16**: desactivada temporalmente para avanzar rápido; retomar más adelante.
 - [ ] Agregar badge de estado del CI al README.
 
 ### Git hooks y calidad de código

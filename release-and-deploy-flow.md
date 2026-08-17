@@ -37,3 +37,9 @@ git push origin main --tags
 - `npm run validate:tracked` sin errores.
 - Prueba funcional mínima en UI (login, navegación base y módulo impactado).
 - Registro actualizado en `development-log.md` y `development-backlog.md`.
+
+## Branch protection en `main` (decisión pendiente)
+
+> **Decisión (2026-08-16):** Se desactivó temporalmente la branch protection de `main` para avanzar a mayor velocidad en el desarrollo. El CI de GitHub Actions sigue activo y se ejecuta en cada push/PR, pero por el momento se permite push directo a `main`.
+>
+> **Pendiente de retomar:** reactivar la branch protection de `main` (requerir PR, aprobaciones y checks del CI). Ver `development-backlog.md` → sección "CI/CD e integración continua".
