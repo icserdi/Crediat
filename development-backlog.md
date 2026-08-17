@@ -3,7 +3,7 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-08-17T07:17:17.187Z
+- Última validación automática: 2026-08-17T07:28:34.834Z
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
@@ -80,7 +80,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [ ] Agregar Prettier como formateador consistente (no hay config actualmente).
 
 ### Seguridad y secretos
-- [ ] Eliminar credenciales hardcodeadas de `docker-compose.yml` (`password123`, `minioadminpassword`) y moverlas a variables de entorno / secrets.
+- [x] Eliminar credenciales hardcodeadas de `docker-compose.yml` (`password123`, `minioadminpassword`) y moverlas a variables de entorno / secrets.
 - [ ] Revisar y mitigar vulnerabilidades reportadas por `npm audit` (67: 52 moderadas, 15 altas).
 - [ ] Evaluar gestor de secretos para producción (no exponer `.env` ni claves en el repo).
 
