@@ -1,12 +1,10 @@
 name: CI
 
-# CI deshabilitado temporalmente (2026-08-17).
-# Para reactivar, descomentar el bloque `on:`.
-# on:
-#   push:
-#     branches: [main, develop]
-#   pull_request:
-#     branches: [main, develop]
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
 
 concurrency:
   group: ci-${{ github.ref }}
