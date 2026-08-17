@@ -14,23 +14,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, use, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-
-type Interaction = {
-  id: string;
-  content: string;
-  type: string;
-  assigned_to: string;
-  created_at: string;
-  metadata: Record<string, unknown>;
-};
+import { useDebtorDetail } from "@/hooks/use-debtor-detail";
 
 export default function DebtorDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { toast } = useToast();
   const [activeCompanyId, setActiveCompanyId] = useState('');
   const [promiseDate, setPromiseDate] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [interactions, setInteractions] = useState<Interaction[]>([]);
+  const { interactions, isSaving, registerPromise } = useDebtorDetail(activeCompanyId, id);
 
   useEffect(() => {
     const cid = localStorage.getItem('activeCompanyId') || '';
@@ -38,67 +29,21 @@ export default function DebtorDetailPage({ params }: { params: Promise<{ id: str
     setActiveCompanyId(cid);
   }, []);
 
-  useEffect(() => {
-    if (!activeCompanyId || !id) return;
-    fetch(`/api/interactions?companyId=${activeCompanyId}&debtorId=${id}&limit=20`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.interactions) setInteractions(data.interactions);
-      })
-      .catch(() => {});
-  }, [activeCompanyId, id]);
-
   const handleRegisterPromise = async () => {
-    if (!promiseDate || !activeCompanyId) {
+    const result = await registerPromise(promiseDate);
+
+    if (result.ok) {
       toast({
-        title: "Datos incompletos",
-        description: "Seleccione una fecha de promesa.",
+        title: result.sapWritten ? "Promesa registrada en SAP" : "Promesa registrada (local)",
+        description: result.message,
+      });
+      setPromiseDate('');
+    } else {
+      toast({
+        title: "Error",
+        description: result.message,
         variant: "destructive",
       });
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      const response = await fetch('/api/sap/write', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          companyId: activeCompanyId,
-          cardCode: id,
-          debtorName: id,
-          type: 'promise',
-          data: { paymentPromise: promiseDate },
-        }),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        toast({
-          title: result.sapWritten ? "Promesa registrada en SAP" : "Promesa registrada (local)",
-          description: result.message,
-        });
-        setPromiseDate('');
-        // Refresh interactions
-        const r = await fetch(`/api/interactions?companyId=${activeCompanyId}&debtorId=${id}&limit=20`);
-        const d = await r.json();
-        if (d.interactions) setInteractions(d.interactions);
-      } else {
-        toast({
-          title: "Error",
-          description: result.message,
-          variant: "destructive",
-        });
-      }
-    } catch {
-      toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
     }
   };
 

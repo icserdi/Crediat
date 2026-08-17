@@ -24,126 +24,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useCallback } from "react";
-import { useToast } from "@/hooks/use-toast";
-import type { SapBusinessPartnerDto } from "@/lib/sap/types";
-
-type Debtor = {
-  id: string;
-  name: string;
-  email: string | null;
-  balance: number;
-  risk: string;
-  score: number;
-  status: string;
-  phone: string | null;
-  cellular: string | null;
-  creditLine: number | null;
-  groupCode: number | null;
-};
+import { useState } from "react";
+import { useDebtors } from "@/hooks/use-debtors";
+import { useActiveCompany } from "@/hooks/use-active-company";
 
 export default function DebtorsPage() {
-  const { toast } = useToast();
-  const [activeCompanyId, setActiveCompanyId] = useState('');
-  const [debtors, setDebtors] = useState<Debtor[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { activeCompanyId } = useActiveCompany();
+  const { debtors, isLoading, error, reload } = useDebtors(activeCompanyId);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const loadDebtors = useCallback(async (companyId?: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const params = new URLSearchParams();
-      if (companyId) params.append('companyId', companyId);
-      params.append('top', '100');
-
-      const response = await fetch(`/api/debtors?${params.toString()}`);
-      const data = await response.json();
-
-        if (response.ok) {
-          // Transformar datos de SAP al formato interno
-          const transformedDebtors: Debtor[] = data.debtors.map((bp: SapBusinessPartnerDto) => {
-            const balance = bp.CurrentAccountBalance || 0;
-            const creditLine = bp.CreditLimit || 0;
-          
-          // Calcular riesgo basado en balance y límite de crédito
-          let risk = 'Bajo';
-          let score = 0;
-          let status = 'Activo';
-
-          if (balance > creditLine * 0.8 && creditLine > 0) {
-            risk = 'Alto';
-            score = 0.85;
-            status = 'Vencido';
-          } else if (balance > creditLine * 0.5 && creditLine > 0) {
-            risk = 'Moderado';
-            score = 0.5;
-            status = 'Activo';
-          } else if (balance === 0) {
-            risk = 'Bajo';
-            score = 0.05;
-            status = 'Liquidado';
-          } else {
-            risk = 'Bajo';
-            score = 0.15;
-            status = 'Activo';
-          }
-
-          return {
-            id: bp.CardCode,
-            name: bp.CardName,
-            email: bp.EmailAddress || null,
-            balance,
-            risk,
-            score,
-            status,
-            phone: bp.Phone1 || null,
-            cellular: bp.Cellular || null,
-            creditLine,
-            groupCode: bp.GroupCode || null,
-          };
-        });
-
-        setDebtors(transformedDebtors);
-      } else {
-        setError(data.message || 'Error al cargar deudores');
-        toast({
-          title: "Error al cargar deudores",
-          description: data.message || 'Error desconocido',
-          variant: "destructive",
-        });
-      }
-    } catch {
-      setError('Error de conexión al servidor');
-      toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const id = localStorage.getItem('activeCompanyId') || '';
-      if (id !== activeCompanyId) {
-        setActiveCompanyId(id);
-        loadDebtors(id);
-      }
-    };
-
-    handleStorageChange();
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [activeCompanyId, loadDebtors]);
-
-  const handleRefresh = () => {
-    loadDebtors(activeCompanyId);
-  };
 
   const filteredDebtors = debtors.filter(debtor =>
     debtor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -165,7 +53,7 @@ export default function DebtorsPage() {
           </div>
           <div className="flex gap-2">
             <Button 
-              onClick={handleRefresh} 
+              onClick={reload} 
               disabled={isLoading}
               variant="outline"
               className="h-11 font-semibold gap-2"
@@ -232,7 +120,7 @@ export default function DebtorsPage() {
                     <div className="flex flex-col items-center gap-3">
                       <AlertCircle className="w-8 h-8 text-red-500" />
                       <p className="text-red-600 font-medium">{error}</p>
-                      <Button onClick={handleRefresh} variant="outline" size="sm" className="gap-2">
+                      <Button onClick={reload} variant="outline" size="sm" className="gap-2">
                         <RefreshCw className="w-4 h-4" />
                         Reintentar
                       </Button>

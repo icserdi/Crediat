@@ -13,7 +13,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
 import { 
   ShieldCheck, 
   Database, 
@@ -24,51 +23,10 @@ import {
   AlertCircle,
   Building2
 } from "lucide-react";
-
-type AuditEvent = {
-  id: string;
-  event_type: string;
-  severity: string;
-  actor: string;
-  actor_role: string | null;
-  entity_type: string | null;
-  entity_id: string | null;
-  description: string;
-  metadata: Record<string, unknown>;
-  company_db: string | null;
-  ip_address: string | null;
-  created_at: string;
-};
+import { useAudit } from "@/hooks/use-audit";
 
 export default function AuditPage() {
-  const [logs, setLogs] = useState<AuditEvent[]>([]);
-  const [stats, setStats] = useState({ logins: 0, logouts: 0, iaInvocations: 0, writes: 0 });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadAudit = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await fetch('/api/audit?limit=100');
-      const data = await response.json();
-      if (response.ok) {
-        setLogs(data.logs);
-        setStats(data.stats);
-      } else {
-        setError(data.message || 'Error al cargar auditoría');
-      }
-    } catch {
-      setError('Error de conexión al servidor');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadAudit();
-  }, []);
+  const { logs, stats, isLoading, error, reload } = useAudit();
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -87,7 +45,7 @@ export default function AuditPage() {
               <ShieldCheck className="w-4 h-4" />
               Append-Only: ACTIVA
             </Badge>
-            <Button onClick={loadAudit} disabled={isLoading} variant="outline" size="sm" className="gap-2">
+            <Button onClick={reload} disabled={isLoading} variant="outline" size="sm" className="gap-2">
               <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
               Recargar
             </Button>

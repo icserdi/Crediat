@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,92 +7,54 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Zap, ShieldCheck, Mail, Lock, ArrowRight } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [step, setStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const { email, setEmail, code, setCode, step, isLoading, sendCode, verifyCode, goBack } = useAuth();
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    const result = await sendCode();
 
-    try {
-      const response = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await response.json();
-
-      if (response.ok) {
-        setStep(2);
-        toast({
-          title: "Código enviado",
-          description: data.message || `Código enviado a ${email}`,
-        });
-      } else if (response.status === 403) {
-        toast({
-          title: "Dominio no autorizado",
-          description: "Solo se permiten correos de dominios corporativos autorizados.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: data.message || 'Error al enviar código',
-          variant: "destructive",
-        });
-      }
-    } catch {
+    if (result.ok) {
       toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
+        title: "Código enviado",
+        description: result.message || `Código enviado a ${email}`,
+      });
+    } else if (result.status === 403) {
+      toast({
+        title: "Dominio no autorizado",
+        description: "Solo se permiten correos de dominios corporativos autorizados.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+    } else {
+      toast({
+        title: "Error",
+        description: result.message || 'Error al enviar código',
+        variant: "destructive",
+      });
     }
   };
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    const result = await verifyCode();
 
-    try {
-      const response = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp: code }),
-      });
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('userRole', data.role);
-        localStorage.setItem('userEmail', data.email);
-        toast({
-          title: "Acceso concedido",
-          description: `Iniciando sesión como ${data.role.toUpperCase()}...`,
-        });
-        router.push("/");
-      } else {
-        toast({
-          title: "Código inválido",
-          description: data.message || "El código ingresado no es correcto.",
-          variant: "destructive",
-        });
-      }
-    } catch {
+    if (result.ok) {
+      const role = localStorage.getItem('userRole') || 'cobrador';
       toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
+        title: "Acceso concedido",
+        description: `Iniciando sesión como ${role.toUpperCase()}...`,
+      });
+      router.push("/");
+    } else {
+      toast({
+        title: "Código inválido",
+        description: result.message || "El código ingresado no es correcto.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -182,7 +143,7 @@ export default function LoginPage() {
                 </Button>
                 <button 
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={goBack}
                   className="w-full text-xs text-muted-foreground hover:text-primary transition-colors font-bold"
                 >
                   Regresar a email

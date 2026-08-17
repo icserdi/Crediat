@@ -18,60 +18,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useCallback } from "react";
-
-type KpiData = {
-  dso: { value: number; description: string };
-  morosidad: { value: number; description: string };
-  recuperacion: { value: number; description: string };
-  rotacion: { value: number; description: string };
-  riesgo: { alto: number; medio: number; bajo: number };
-  totalAr: number;
-  totalDebtors: number;
-  openInvoices: number;
-  companyDb: string;
-};
+import { useKpis } from "@/hooks/use-kpis";
+import { useActiveCompany } from "@/hooks/use-active-company";
 
 export default function Dashboard() {
-  const [data, setData] = useState<KpiData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeCompanyId, setActiveCompanyId] = useState('');
-
-  const loadKpis = useCallback(async (companyId?: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const params = new URLSearchParams();
-      if (companyId) params.append('companyId', companyId);
-
-      const response = await fetch(`/api/kpi?${params.toString()}`);
-      const result = await response.json();
-
-      if (response.ok) {
-        setData(result);
-      } else {
-        setError(result.message || 'Error al cargar KPIs');
-      }
-    } catch {
-      setError('Error de conexión al servidor');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const id = localStorage.getItem('activeCompanyId') || '';
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setActiveCompanyId(id);
-    if (id) loadKpis(id);
-    else setIsLoading(false);
-  }, [loadKpis]);
-
-  const handleRefresh = () => {
-    loadKpis(activeCompanyId);
-  };
+  const { activeCompanyId } = useActiveCompany();
+  const { data, isLoading, error, reload } = useKpis(activeCompanyId);
 
   if (isLoading) {
     return (
@@ -95,7 +47,7 @@ export default function Dashboard() {
           <div className="flex flex-col items-center gap-3">
             <AlertCircle className="w-8 h-8 text-red-500" />
             <p className="text-red-600 font-medium">{error}</p>
-            <Button onClick={handleRefresh} variant="outline" size="sm" className="gap-2">
+            <Button onClick={reload} variant="outline" size="sm" className="gap-2">
               <RefreshCw className="w-4 h-4" /> Reintentar
             </Button>
           </div>
@@ -118,7 +70,7 @@ export default function Dashboard() {
               <Zap className="w-3.5 h-3.5 text-accent" />
               Estado IA: Sincronizado
             </Badge>
-            <Button onClick={handleRefresh} variant="outline" size="sm" className="gap-2">
+            <Button onClick={reload} variant="outline" size="sm" className="gap-2">
               <RefreshCw className="w-4 h-4" /> Recargar
             </Button>
           </div>

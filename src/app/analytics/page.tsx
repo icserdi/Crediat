@@ -24,62 +24,12 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useCallback } from "react";
-
-type AnalyticsData = {
-  kpi: {
-    morosidad: number;
-    recuperacion: number;
-    rotacion: number;
-  };
-  cashFlowProjection: {
-    day: string;
-    actual: number;
-    projected: number;
-  }[];
-  monthlyTrend: {
-    month: string;
-    recovery: number;
-    morbidity: number;
-  }[];
-  insights: {
-    title: string;
-    description: string;
-    type: 'info' | 'warning' | 'success';
-  }[];
-  totalDebtors: number;
-  totalAr: number;
-  asOf: string;
-};
+import { useAnalytics } from "@/hooks/use-analytics";
+import { useActiveCompany } from "@/hooks/use-active-company";
 
 export default function AnalyticsPage() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadAnalytics = useCallback(async (companyId?: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const params = new URLSearchParams();
-      if (companyId) params.append('companyId', companyId);
-      const response = await fetch(`/api/analytics/data?${params.toString()}`);
-      const result = await response.json();
-      if (response.ok) setData(result);
-      else setError(result.message || 'Error al cargar analítica');
-    } catch {
-      setError('Error de conexión al servidor');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const id = localStorage.getItem('activeCompanyId') || '';
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (id) loadAnalytics(id);
-    else setIsLoading(false);
-  }, [loadAnalytics]);
+  const { activeCompanyId } = useActiveCompany();
+  const { data, isLoading, error } = useAnalytics(activeCompanyId);
 
   if (isLoading) {
     return (

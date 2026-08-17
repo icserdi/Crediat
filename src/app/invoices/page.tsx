@@ -30,114 +30,15 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { useState, useEffect, useCallback } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import type { SapInvoiceDto } from "@/lib/sap/types";
-
-type Invoice = {
-  docEntry: number;
-  docNum: number;
-  cardCode: string;
-  cardName: string;
-  date: string;
-  dueDate: string;
-  total: number;
-  currency: string;
-  status: string;
-  daysOverdue: number;
-};
+import { useInvoices } from "@/hooks/use-invoices";
+import { useActiveCompany } from "@/hooks/use-active-company";
 
 export default function InvoicesPage() {
-  const { toast } = useToast();
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { activeCompanyId } = useActiveCompany();
+  const { invoices, isLoading, error, reload } = useInvoices(activeCompanyId);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCompanyId, setActiveCompanyId] = useState('');
-
-  const loadInvoices = useCallback(async (companyId?: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const params = new URLSearchParams();
-      if (companyId) params.append('companyId', companyId);
-      params.append('top', '100');
-
-      const response = await fetch(`/api/invoices?${params.toString()}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        const transformed: Invoice[] = data.invoices.map((inv: SapInvoiceDto) => {
-          const dueDate = new Date(inv.DocDueDate);
-          const today = new Date();
-          const diffTime = today.getTime() - dueDate.getTime();
-          const daysOverdue = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-
-          let status = 'Pagada';
-          if (inv.DocumentStatus === 'bost_Open') {
-            status = daysOverdue > 0 ? 'Vencida' : 'Pendiente';
-          } else if (inv.DocumentStatus === 'bost_Delivered') {
-            status = 'Parcial';
-          }
-
-          return {
-            docEntry: inv.DocEntry,
-            docNum: inv.DocNum,
-            cardCode: inv.CardCode,
-            cardName: inv.CardName,
-            date: inv.DocDate,
-            dueDate: inv.DocDueDate,
-            total: inv.DocTotal,
-            currency: inv.DocCurrency,
-            status,
-            daysOverdue,
-          };
-        });
-
-        setInvoices(transformed);
-      } else {
-        setError(data.message || 'Error al cargar facturas');
-        toast({
-          title: "Error al cargar facturas",
-          description: data.message || 'Error desconocido',
-          variant: "destructive",
-        });
-      }
-    } catch {
-      setError('Error de conexión al servidor');
-      toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
-  useEffect(() => {
-    const id = localStorage.getItem('activeCompanyId') || '';
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setActiveCompanyId(id);
-    if (id) loadInvoices(id);
-    else setIsLoading(false);
-
-    const handler = () => {
-      const newId = localStorage.getItem('activeCompanyId') || '';
-      if (newId !== activeCompanyId) {
-        setActiveCompanyId(newId);
-        loadInvoices(newId);
-      }
-    };
-    window.addEventListener('storage', handler);
-    return () => window.removeEventListener('storage', handler);
-  }, [activeCompanyId, loadInvoices]);
-
-  const handleRefresh = useCallback(() => {
-    loadInvoices(activeCompanyId);
-  }, [loadInvoices, activeCompanyId]);
 
   const overdueTotal = invoices
     .filter(i => i.status === 'Vencida')
@@ -171,7 +72,7 @@ export default function InvoicesPage() {
           </div>
           <div className="flex gap-3">
             <Button
-              onClick={handleRefresh}
+              onClick={reload}
               disabled={isLoading}
               variant="outline"
               className="gap-2"
@@ -251,7 +152,7 @@ export default function InvoicesPage() {
               <div className="flex flex-col items-center gap-3">
                 <AlertCircle className="w-8 h-8 text-red-500" />
                 <p className="text-red-600 font-medium">{error}</p>
-                <Button onClick={handleRefresh} variant="outline" size="sm" className="gap-2">
+                <Button onClick={reload} variant="outline" size="sm" className="gap-2">
                   <RefreshCw className="w-4 h-4" /> Reintentar
                 </Button>
               </div>

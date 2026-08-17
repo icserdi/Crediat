@@ -18,24 +18,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-type Interaction = {
-  id: string;
-  company_db: string;
-  debtor_id: string;
-  debtor_name: string;
-  type: string;
-  content: string;
-  direction: string;
-  status: string;
-  assigned_to: string;
-  user_id: string | null;
-  metadata: Record<string, unknown>;
-  created_at: string;
-};
+import { useInteractions } from "@/hooks/use-interactions";
+import { useActiveCompany } from "@/hooks/use-active-company";
 
 const companyIcons: Record<string, typeof MessageSquare> = {
   WhatsApp: MessageSquare,
@@ -45,93 +32,26 @@ const companyIcons: Record<string, typeof MessageSquare> = {
 
 export default function InteractionsPage() {
   const { toast } = useToast();
-  const [interactions, setInteractions] = useState<Interaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { activeCompanyId } = useActiveCompany();
+  const { interactions, isLoading, error, isSending, reload, send } = useInteractions(activeCompanyId);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCompanyId, setActiveCompanyId] = useState('');
   const [newMessage, setNewMessage] = useState('');
-  const [isSending, setIsSending] = useState(false);
-
-  const loadInteractions = async (companyId?: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const params = new URLSearchParams();
-      if (companyId) params.append('companyId', companyId);
-      params.append('limit', '50');
-
-      const response = await fetch(`/api/interactions?${params.toString()}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        setInteractions(data.interactions);
-      } else {
-        setError(data.message || 'Error al cargar interacciones');
-      }
-    } catch {
-      setError('Error de conexión al servidor');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const id = localStorage.getItem('activeCompanyId') || '';
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setActiveCompanyId(id);
-    if (id) loadInteractions(id);
-    else setIsLoading(false);
-  }, []);
 
   const handleSend = async () => {
-    if (!newMessage.trim() || !activeCompanyId) return;
-
-    setIsSending(true);
-    try {
-      const response = await fetch('/api/interactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          companyDb: activeCompanyId,
-          debtorId: 'manual',
-          debtorName: 'Manual',
-          type: 'WhatsApp',
-          content: newMessage.trim(),
-          direction: 'outbound',
-          assignedTo: 'Sistema IA',
-        }),
-      });
-
-      if (response.ok) {
-        setNewMessage('');
-        toast({
-          title: "Mensaje enviado",
-          description: "La interacción ha sido registrada en el sistema.",
-        });
-        loadInteractions(activeCompanyId);
-      } else {
-        const data = await response.json();
-        toast({
-          title: "Error al enviar",
-          description: data.message || 'Error desconocido',
-          variant: "destructive",
-        });
-      }
-    } catch {
+    const ok = await send(newMessage);
+    if (ok) {
+      setNewMessage('');
       toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
+        title: "Mensaje enviado",
+        description: "La interacción ha sido registrada en el sistema.",
+      });
+    } else {
+      toast({
+        title: "Error al enviar",
+        description: "No se pudo registrar la interacción.",
         variant: "destructive",
       });
-    } finally {
-      setIsSending(false);
     }
-  };
-
-  const handleRefresh = () => {
-    loadInteractions(activeCompanyId);
   };
 
   const filteredInteractions = interactions.filter(i =>
@@ -155,7 +75,7 @@ export default function InteractionsPage() {
               </div>
             </div>
             <Button
-              onClick={handleRefresh}
+              onClick={reload}
               disabled={isLoading}
               variant="outline"
               className="gap-2 rounded-xl font-bold border-primary/10"

@@ -35,56 +35,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import type { SapCompany } from "@/lib/sap/types";
+import { useSapCompanies, type CompanyFormData } from "@/hooks/use-sap-companies";
+
+const emptyForm: CompanyFormData = {
+  companyDb: '',
+  friendlyName: '',
+  description: '',
+  isActive: true,
+};
 
 export default function SapCompaniesPage() {
-const router = useRouter();
+  const router = useRouter();
   const { toast } = useToast();
+  const { companies, isLoading, reload, create, update, remove, assign } = useSapCompanies();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [companies, setCompanies] = useState<SapCompany[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<SapCompany | null>(null);
-  const [formData, setFormData] = useState({
-    companyDb: '',
-    friendlyName: '',
-    description: '',
-    isActive: true,
-  });
+  const [formData, setFormData] = useState<CompanyFormData>(emptyForm);
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const [assignmentFormData, setAssignmentFormData] = useState({
     userId: '',
     companyIds: [] as string[],
   });
-
-  const loadCompanies = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/admin/sap-companies');
-      const data = await response.json();
-      if (response.ok) {
-        setCompanies(data.companies);
-      } else {
-        toast({
-          title: "Error al cargar empresas",
-          description: data.message || 'Error desconocido',
-          variant: "destructive",
-        });
-      }
-    } catch {
-      toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
 
   useEffect(() => {
     const role = localStorage.getItem('userRole');
@@ -93,18 +70,12 @@ const router = useRouter();
     } else {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAdmin(true);
-      loadCompanies();
     }
-  }, [router, loadCompanies]);
+  }, [router]);
 
   const handleCreate = () => {
     setEditingCompany(null);
-    setFormData({
-      companyDb: '',
-      friendlyName: '',
-      description: '',
-      isActive: true,
-    });
+    setFormData(emptyForm);
     setIsDialogOpen(true);
   };
 
@@ -121,85 +92,39 @@ const router = useRouter();
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Está seguro de eliminar esta empresa SAP?')) return;
-
-    try {
-      const response = await fetch(`/api/admin/sap-companies/${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (response.ok) {
-        toast({
-          title: "Empresa eliminada",
-          description: "La empresa SAP ha sido eliminada correctamente",
-        });
-        loadCompanies();
-      } else {
-        const data = await response.json();
-        toast({
-          title: "Error al eliminar",
-          description: data.message || 'Error desconocido',
-          variant: "destructive",
-        });
-      }
-    } catch {
-      toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
-        variant: "destructive",
-      });
-    }
+    const result = await remove(id);
+    toast({
+      title: result.ok ? "Empresa eliminada" : "Error al eliminar",
+      description: result.ok
+        ? "La empresa SAP ha sido eliminada correctamente"
+        : result.message || 'Error desconocido',
+      variant: result.ok ? "default" : "destructive",
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const result = editingCompany
+      ? await update(editingCompany.id, formData)
+      : await create(formData);
 
-    try {
-      const url = editingCompany 
-        ? `/api/admin/sap-companies/${editingCompany.id}`
-        : '/api/admin/sap-companies';
-      
-      const method = editingCompany ? 'PATCH' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast({
-          title: editingCompany ? "Empresa actualizada" : "Empresa creada",
-          description: editingCompany 
+    toast({
+      title: result.ok
+        ? (editingCompany ? "Empresa actualizada" : "Empresa creada")
+        : "Error al guardar",
+      description: result.ok
+        ? (editingCompany
             ? "La empresa SAP ha sido actualizada correctamente"
-            : "La empresa SAP ha sido creada correctamente",
-        });
-        setIsDialogOpen(false);
-        loadCompanies();
-      } else {
-        toast({
-          title: "Error al guardar",
-          description: data.message || 'Error desconocido',
-          variant: "destructive",
-        });
-      }
-    } catch {
-      toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con el servidor",
-        variant: "destructive",
-      });
-    }
+            : "La empresa SAP ha sido creada correctamente")
+        : result.message || 'Error desconocido',
+      variant: result.ok ? "default" : "destructive",
+    });
+
+    if (result.ok) setIsDialogOpen(false);
   };
 
   const handleOpenAssignmentDialog = () => {
-    setAssignmentFormData({
-      userId: '',
-      companyIds: [],
-    });
+    setAssignmentFormData({ userId: '', companyIds: [] });
     setAssignmentDialogOpen(true);
   };
 
@@ -215,41 +140,16 @@ const router = useRouter();
       return;
     }
 
-    try {
-      const response = await fetch('/api/admin/sap-companies/assignments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: assignmentFormData.userId,
-          companyIds: assignmentFormData.companyIds,
-          assignedBy: 'admin', // En producción, usar el ID del usuario actual
-        }),
-      });
+    const result = await assign(assignmentFormData.userId, assignmentFormData.companyIds);
+    toast({
+      title: result.ok ? "Asignación creada" : "Error al asignar",
+      description: result.ok
+        ? "El usuario ha sido asignado a las empresas seleccionadas"
+        : result.message || 'Error desconocido',
+      variant: result.ok ? "default" : "destructive",
+    });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        toast({
-          title: "Asignación creada",
-          description: "El usuario ha sido asignado a las empresas seleccionadas",
-        });
-        setAssignmentDialogOpen(false);
-      } else {
-        toast({
-          title: "Error al asignar",
-          description: data.message || 'Error desconocido',
-          variant: "destructive",
-        });
-      }
-} catch {
-      toast({
-        title: "Error al asignar",
-        description: "Error de conexión",
-        variant: "destructive",
-      });
-    }
+    if (result.ok) setAssignmentDialogOpen(false);
   };
 
   const toggleCompanySelection = (companyId: string) => {
@@ -297,7 +197,7 @@ const router = useRouter();
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={loadCompanies}
+                onClick={reload}
                 disabled={isLoading}
                 className="gap-2"
               >
