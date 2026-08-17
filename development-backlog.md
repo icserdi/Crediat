@@ -66,6 +66,40 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [x] Estrategia de repos: Gitea (desarrollo principal) y GitHub (release productivo validado).
 - [x] Docker local funcional: `docker compose up -d --build`
 
+## Mejores prácticas de desarrollo — pendiente
+
+### CI/CD e integración continua
+- [ ] Crear pipeline de GitHub Actions (`.github/workflows/ci.yml`) que corra en cada push/PR: `npm ci` → `lint` → `typecheck` → `test` → `build`.
+- [ ] Configurar branch protection en `main` (requerir PRs, checks obligatorios, sin push directo).
+- [ ] Agregar badge de estado del CI al README.
+
+### Git hooks y calidad de código
+- [ ] Agregar pre-commit hook que corra lint + typecheck + tests antes de permitir el commit (hoy solo hay post-commit).
+- [ ] Integrar Husky + lint-staged para que el pre-commit solo valide archivos modificados (rápido).
+- [ ] Formalizar Conventional Commits con commitlint + generación de changelog automático.
+- [ ] Agregar Prettier como formateador consistente (no hay config actualmente).
+
+### Seguridad y secretos
+- [ ] Eliminar credenciales hardcodeadas de `docker-compose.yml` (`password123`, `minioadminpassword`) y moverlas a variables de entorno / secrets.
+- [ ] Revisar y mitigar vulnerabilidades reportadas por `npm audit` (67: 52 moderadas, 15 altas).
+- [ ] Evaluar gestor de secretos para producción (no exponer `.env` ni claves en el repo).
+
+### Pruebas
+- [ ] Agregar cobertura de código con `@vitest/coverage-v8` y umbral mínimo (ej. 80%) sobre la lógica crítica.
+- [ ] Pruebas de integración para el cliente SAP (`src/lib/sap/client.ts`) con `fetch` mockeado.
+- [ ] Pruebas E2E con Playwright/Cypress para flujos críticos (login OTP, navegación, dashboard).
+
+### Infraestructura y observabilidad
+- [ ] Agregar `healthcheck` a los servicios de `docker-compose.yml` (db, redis, minio, app).
+- [ ] Logging estructurado, métricas y tracing (OpenTelemetry) para producción.
+- [ ] Documentación de API con OpenAPI/Swagger para los endpoints.
+
+### Desacoplamiento UI ↔ código funcional
+- [ ] Refactorizar páginas hacia separación contenedor/presentación: componentes de presentación puros que reciban datos por props, y hooks de datos separados (fetch/estado fuera del JSX).
+- [ ] Extraer clases utilitarias repetidas en las páginas hacia componentes/tokens reutilizables (hoy hay `rounded-3xl`, `shadow-2xl`, `text-[10px]`, etc. hardcodeados).
+- [ ] Centralizar el diseño en tokens de tema (ya hay variables CSS para colores/fuentes) para que un rediseño no toque código funcional.
+- [ ] Mover lógica de negocio (fetch, localStorage, autenticación) fuera de los componentes de página hacia capas/servicios dedicados.
+
 ## Post-MVP — Funcionalidades a evaluar
 
 ### Validación de RFC (para módulo de crédito)
