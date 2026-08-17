@@ -1,5 +1,7 @@
 # Crediat: Gestión Inteligente de Crédito y Cobranza
 
+[![CI](https://github.com/icserdi/Crediat/actions/workflows/ci.yml/badge.svg)](https://github.com/icserdi/Crediat/actions/workflows/ci.yml)
+
 Sistema de Gestión de Cobranza con IA para la recuperación de cartera de alto rendimiento.
 
 ## Requerimientos de Seguridad y Acceso (v1.1)

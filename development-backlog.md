@@ -3,7 +3,7 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-08-17T07:15:14.841Z
+- Última validación automática: 2026-08-17T07:17:17.187Z
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
@@ -71,10 +71,10 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 ### CI/CD e integración continua
 - [x] Crear pipeline de GitHub Actions (`.github/workflows/ci.yml`) que corra en cada push/PR: `npm ci` → `lint` → `typecheck` → `test` → `build`.
 - [ ] Configurar branch protection en `main` (requerir PRs, checks obligatorios, sin push directo). **Pausado 2026-08-16**: desactivada temporalmente para avanzar rápido; retomar más adelante.
-- [ ] Agregar badge de estado del CI al README.
+- [x] Agregar badge de estado del CI al README.
 
 ### Git hooks y calidad de código
-- [ ] Agregar pre-commit hook que corra lint + typecheck + tests antes de permitir el commit (hoy solo hay post-commit).
+- [x] Agregar pre-commit hook que corra lint + typecheck + tests antes de permitir el commit (hoy solo hay post-commit).
 - [ ] Integrar Husky + lint-staged para que el pre-commit solo valide archivos modificados (rápido).
 - [ ] Formalizar Conventional Commits con commitlint + generación de changelog automático.
 - [ ] Agregar Prettier como formateador consistente (no hay config actualmente).
@@ -95,10 +95,10 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [ ] Documentación de API con OpenAPI/Swagger para los endpoints.
 
 ### Desacoplamiento UI ↔ código funcional
-- [ ] Refactorizar páginas hacia separación contenedor/presentación: componentes de presentación puros que reciban datos por props, y hooks de datos separados (fetch/estado fuera del JSX).
+- [x] Refactorizar páginas hacia separación contenedor/presentación: componentes de presentación puros que reciban datos por props, y hooks de datos separados (fetch/estado fuera del JSX).
 - [ ] Extraer clases utilitarias repetidas en las páginas hacia componentes/tokens reutilizables (hoy hay `rounded-3xl`, `shadow-2xl`, `text-[10px]`, etc. hardcodeados).
 - [ ] Centralizar el diseño en tokens de tema (ya hay variables CSS para colores/fuentes) para que un rediseño no toque código funcional.
-- [ ] Mover lógica de negocio (fetch, localStorage, autenticación) fuera de los componentes de página hacia capas/servicios dedicados.
+- [x] Mover lógica de negocio (fetch, localStorage, autenticación) fuera de los componentes de página hacia capas/servicios dedicados.
 
 ## Post-MVP — Funcionalidades a evaluar
 
