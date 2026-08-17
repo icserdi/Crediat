@@ -1,4 +1,4 @@
-# **App Name**: Smart Collections Hub
+# **App Name**: Crediat
 
 ## Core Features:
 
