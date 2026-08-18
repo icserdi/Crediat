@@ -3,7 +3,7 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-08-17T23:48:11.738Z
+- Última validación automática: 2026-08-18T00:16:51.893Z
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
@@ -81,8 +81,14 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 ### Seguridad y secretos
 - [x] Eliminar credenciales hardcodeadas de `docker-compose.yml` (`password123`, `minioadminpassword`) y moverlas a variables de entorno / secrets.
-- [x] Revisar y mitigar vulnerabilidades reportadas por `npm audit` (67 → 62: 52 moderadas, 10 altas). Las restantes provienen de dependencias transitivas opcionales de genkit (OpenTelemetry, @google-cloud/*, firebase-admin) sin fix disponible; no se usan directamente y se re-evaluarán con la próxima actualización de genkit.
+- [x] Mitigar vulnerabilidades de `npm audit` eliminando genkit (62 transitivas resueltas). Quedan 3 altas de `sharp` (dependencia de Next.js), con fix vía `next@16` (breaking change) pendiente.
 - [ ] Evaluar gestor de secretos para producción (no exponer `.env` ni claves en el repo).
+
+### Migración de IA (genkit → Vercel AI SDK)
+- [x] Migrar `src/ai/` de genkit a Vercel AI SDK + OpenRouter (proveedor multi-modelo). Eliminó las vulnerabilidades transitivas de genkit.
+- [ ] Agregar soporte de Microsoft Foundry (Azure AI Foundry) como segundo proveedor vía `@ai-sdk/azure`.
+- [ ] Conectar los flujos de IA (predictCashFlow, generateCollectionMessage) a rutas API para uso real desde la UI.
+- [ ] Documentar configuración de OpenRouter/Foundry en README (OPENROUTER_API_KEY, OPENROUTER_MODEL).
 
 ### Pruebas
 - [ ] Agregar cobertura de código con `@vitest/coverage-v8` y umbral mínimo (ej. 80%) sobre la lógica crítica.
