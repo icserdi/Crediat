@@ -3,7 +3,7 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-08-18T16:58:06.677Z
+- Última validación automática: 2026-08-18T23:58:14.961Z
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
@@ -86,8 +86,8 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 ### Migración de IA (genkit → Vercel AI SDK)
 - [x] Migrar `src/ai/` de genkit a Vercel AI SDK + OpenRouter (proveedor multi-modelo). Eliminó las vulnerabilidades transitivas de genkit.
-- [ ] Agregar soporte de Microsoft Foundry (Azure AI Foundry) como segundo proveedor vía `@ai-sdk/azure`.
-- [ ] Conectar los flujos de IA (predictCashFlow, generateCollectionMessage) a rutas API para uso real desde la UI.
+- [x] Agregar soporte de Microsoft Foundry (Azure AI Foundry) como segundo proveedor vía `@ai-sdk/azure`.
+- [x] Conectar los flujos de IA (predictCashFlow, generateCollectionMessage) a rutas API para uso real desde la UI.
 - [ ] Documentar configuración de OpenRouter/Foundry en README (OPENROUTER_API_KEY, OPENROUTER_MODEL).
 
 ### Pruebas
