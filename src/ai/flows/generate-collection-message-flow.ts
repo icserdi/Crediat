@@ -4,7 +4,7 @@
  * Usa Vercel AI SDK + OpenRouter.
  */
 
-import { generateText, tool } from 'ai';
+import { generateText, tool, isStepCount } from 'ai';
 import { z } from 'zod';
 import { model, MODEL_ID } from '@/ai/model';
 
@@ -50,6 +50,7 @@ export async function generateCollectionMessage(input: GenerateCollectionMessage
   const result = await generateText({
     model,
     tools: { getDebtorHistory },
+    stopWhen: isStepCount(5),
     system: `Eres un experto en cobranza y recuperación de cartera para el mercado mexicano.
 Tu objetivo es redactar un mensaje efectivo, profesional y empático en español de México (tú/usted según el riesgo).`,
     prompt: `Deudor: ${input.debtorId}
