@@ -14,7 +14,7 @@ services:
     container_name: collections-db
     restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-smart_collections}
+      POSTGRES_DB: ${POSTGRES_DB:-crediat}
       POSTGRES_USER: ${POSTGRES_USER:-admin}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password123}
     ports:
@@ -63,7 +63,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://admin:password123@db:5432/smart_collections}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://admin:password123@db:5432/crediat}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio}
       MINIO_PORT: ${MINIO_PORT:-9000}
