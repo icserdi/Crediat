@@ -20,6 +20,8 @@ export default defineConfig({
         'src/lib/sap/retry.ts',
         'src/lib/sap/config.ts',
         'src/lib/sap/companies-store.ts',
+        'src/lib/sap/client.ts',
+        'src/lib/sap/session-manager.ts',
       ],
       thresholds: {
         statements: 80,
