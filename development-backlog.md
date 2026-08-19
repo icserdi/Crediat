@@ -3,7 +3,7 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-08-18T23:59:13.751Z
+- Última validación automática: 2026-08-19T00:00:49.701Z
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
@@ -91,7 +91,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [x] Documentar configuración de OpenRouter/Foundry en README (OPENROUTER_API_KEY, OPENROUTER_MODEL).
 
 ### Pruebas
-- [ ] Agregar cobertura de código con `@vitest/coverage-v8` y umbral mínimo (ej. 80%) sobre la lógica crítica.
+- [x] Agregar cobertura de código con `@vitest/coverage-v8` y umbral mínimo (80% stmts/lines/funcs, 70% branch) sobre la lógica crítica (auth + capa SAP).
 - [ ] Pruebas de integración para el cliente SAP (`src/lib/sap/client.ts`) con `fetch` mockeado.
 - [ ] Pruebas E2E con Playwright/Cypress para flujos críticos (login OTP, navegación, dashboard).
 
