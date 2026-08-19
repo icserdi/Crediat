@@ -24,6 +24,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { useAudit } from '@/hooks/use-audit';
+import { PageHeader } from '@/components/shared/page-header';
 
 export default function AuditPage() {
   const { logs, stats, isLoading, error, reload } = useAudit();
@@ -32,33 +33,29 @@ export default function AuditPage() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
       <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-          <div>
-            <h2 className="text-4xl font-headline font-bold text-primary">Logs de Auditoría</h2>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Building2 className="w-4 h-4" />
-              <p className="text-lg italic">
-                Registro inmutable de todas las intervenciones manuales, IA y accesos.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge className="bg-primary text-white px-4 py-2 font-bold gap-2">
-              <ShieldCheck className="w-4 h-4" />
-              Append-Only: ACTIVA
-            </Badge>
-            <Button
-              onClick={reload}
-              disabled={isLoading}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
-              <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
-              Recargar
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          title="Logs de Auditoría"
+          description="Registro inmutable de todas las intervenciones manuales, IA y accesos."
+          icon={Building2}
+          actions={
+            <>
+              <Badge className="bg-primary text-white px-4 py-2 font-bold gap-2">
+                <ShieldCheck className="w-4 h-4" />
+                Append-Only: ACTIVA
+              </Badge>
+              <Button
+                onClick={reload}
+                disabled={isLoading}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
+                Recargar
+              </Button>
+            </>
+          }
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="border-none shadow-md">

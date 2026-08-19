@@ -26,6 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useActiveCompany } from '@/hooks/use-active-company';
+import { PageHeader } from '@/components/shared/page-header';
 
 export default function AnalyticsPage() {
   const { activeCompanyId } = useActiveCompany();
@@ -63,19 +64,11 @@ export default function AnalyticsPage() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
       <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-        <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-          <div>
-            <h2 className="text-4xl font-headline font-bold text-primary">
-              Analítica e Inteligencia
-            </h2>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Building2 className="w-4 h-4" />
-              <p className="text-lg">
-                Perspectivas profundas de ciclos de cobro basadas en datos SAP.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
+        <PageHeader
+          title="Analítica e Inteligencia"
+          description="Perspectivas profundas de ciclos de cobro basadas en datos SAP."
+          icon={Building2}
+          actions={
             <Badge
               variant="outline"
               className="bg-white px-3 py-1.5 gap-2 text-xs font-semibold border-primary/20"
@@ -83,8 +76,8 @@ export default function AnalyticsPage() {
               <Zap className="w-3.5 h-3.5 text-accent" />
               Datos al {data?.asOf ? new Date(data.asOf).toLocaleDateString() : '-'}
             </Badge>
-          </div>
-        </header>
+          }
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="border-none shadow-sm">

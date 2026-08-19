@@ -31,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import type { SapCompany } from '@/lib/sap/types';
 import { useSapCompanies, type CompanyFormData } from '@/hooks/use-sap-companies';
+import { PageHeader } from '@/components/shared/page-header';
 
 const emptyForm: CompanyFormData = {
   companyDb: '',
@@ -159,32 +160,28 @@ export default function SapCompaniesPage() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
       <main className="flex-1 p-4 md:p-8">
-        <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-          <div className="space-y-1">
-            <h2 className="text-4xl font-headline font-bold text-primary">
-              Catálogo de Empresas SAP
-            </h2>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Database className="w-4 h-4 text-primary" />
-              <p className="text-lg">Gestión de bases de datos CompanyDB de SAP Business One</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button
-              onClick={handleOpenAssignmentDialog}
-              variant="outline"
-              className="rounded-xl h-12 px-6 font-bold gap-3 border-primary/20 text-primary hover:bg-primary/5"
-            >
-              <Users className="w-5 h-5" /> Asignar Empresas a Usuario
-            </Button>
-            <Button
-              onClick={handleCreate}
-              className="bg-primary hover:bg-primary/90 rounded-xl h-12 px-8 font-bold gap-3 shadow-xl shadow-primary/20 text-white"
-            >
-              <Plus className="w-5 h-5" /> Nueva Empresa SAP
-            </Button>
-          </div>
-        </header>
+        <PageHeader
+          title="Catálogo de Empresas SAP"
+          description="Gestión de bases de datos CompanyDB de SAP Business One"
+          icon={Database}
+          actions={
+            <>
+              <Button
+                onClick={handleOpenAssignmentDialog}
+                variant="outline"
+                className="rounded-xl h-12 px-6 font-bold gap-3 border-primary/20 text-primary hover:bg-primary/5"
+              >
+                <Users className="w-5 h-5" /> Asignar Empresas a Usuario
+              </Button>
+              <Button
+                onClick={handleCreate}
+                className="bg-primary hover:bg-primary/90 rounded-xl h-12 px-8 font-bold gap-3 shadow-xl shadow-primary/20 text-white"
+              >
+                <Plus className="w-5 h-5" /> Nueva Empresa SAP
+              </Button>
+            </>
+          }
+        />
 
         <Card className="border-none shadow-xl rounded-2xl bg-white overflow-hidden">
           <CardHeader className="bg-muted/10 border-b">

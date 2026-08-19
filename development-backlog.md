@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-19T07:23:32.251Z
+- Última validación automática: 2026-08-19T07:25:04.509Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -114,8 +114,8 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 ### Desacoplamiento UI ↔ código funcional
 
 - [x] Refactorizar páginas hacia separación contenedor/presentación: componentes de presentación puros que reciban datos por props, y hooks de datos separados (fetch/estado fuera del JSX).
-- [ ] Extraer clases utilitarias repetidas en las páginas hacia componentes/tokens reutilizables (hoy hay `rounded-3xl`, `shadow-2xl`, `text-[10px]`, etc. hardcodeados).
-- [ ] Centralizar el diseño en tokens de tema (ya hay variables CSS para colores/fuentes) para que un rediseño no toque código funcional.
+- [x] Extraer clases utilitarias repetidas en las páginas hacia componentes/tokens reutilizables (hoy hay `rounded-3xl`, `shadow-2xl`, `text-[10px]`, etc. hardcodeados).
+- [x] Centralizar el diseño en tokens de tema (ya hay variables CSS para colores/fuentes) para que un rediseño no toque código funcional.
 - [x] Mover lógica de negocio (fetch, localStorage, autenticación) fuera de los componentes de página hacia capas/servicios dedicados.
 
 ## Post-MVP — Funcionalidades a evaluar

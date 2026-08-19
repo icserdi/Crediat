@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useDebtors } from '@/hooks/use-debtors';
 import { useActiveCompany } from '@/hooks/use-active-company';
+import { PageHeader } from '@/components/shared/page-header';
 
 export default function DebtorsPage() {
   const { activeCompanyId } = useActiveCompany();
@@ -44,30 +45,28 @@ export default function DebtorsPage() {
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
       <main className="flex-1 p-4 md:p-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-          <div>
-            <h2 className="text-4xl font-headline font-bold text-primary">Cartera de Deudores</h2>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Building2 className="w-4 h-4" />
-              <p className="text-lg">Gestión de cuentas para la unidad de negocio seleccionada.</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={reload}
-              disabled={isLoading}
-              variant="outline"
-              className="h-11 font-semibold gap-2"
-            >
-              <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
-              {isLoading ? 'Cargando...' : 'Recargar'}
-            </Button>
-            <Button className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20 h-11 px-6 font-bold">
-              <UserPlus className="w-4 h-4 mr-2" />
-              Dar de Alta Deudor
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          title="Cartera de Deudores"
+          description="Gestión de cuentas para la unidad de negocio seleccionada."
+          icon={Building2}
+          actions={
+            <>
+              <Button
+                onClick={reload}
+                disabled={isLoading}
+                variant="outline"
+                className="h-11 font-semibold gap-2"
+              >
+                <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
+                {isLoading ? 'Cargando...' : 'Recargar'}
+              </Button>
+              <Button className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20 h-11 px-6 font-bold">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Dar de Alta Deudor
+              </Button>
+            </>
+          }
+        />
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-none">
           <div className="p-6 border-b bg-muted/5">

@@ -34,6 +34,8 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useInvoices } from '@/hooks/use-invoices';
 import { useActiveCompany } from '@/hooks/use-active-company';
+import { PageHeader } from '@/components/shared/page-header';
+import { StatCard } from '@/components/shared/stat-card';
 
 export default function InvoicesPage() {
   const { activeCompanyId } = useActiveCompany();
@@ -63,63 +65,40 @@ export default function InvoicesPage() {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       <main className="flex-1 p-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-          <div>
-            <h2 className="text-3xl font-headline font-bold text-primary">Ledger de Facturación</h2>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Building2 className="w-4 h-4" />
-              <p className="text-lg">Monitoreo de cuentas por cobrar desde SAP B1.</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button onClick={reload} disabled={isLoading} variant="outline" className="gap-2">
-              <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
-              {isLoading ? 'Cargando...' : 'Recargar'}
-            </Button>
-            <Button className="bg-accent hover:bg-accent/90">Acción de Cobro Masivo</Button>
-          </div>
-        </div>
+        <PageHeader
+          title="Ledger de Facturación"
+          description="Monitoreo de cuentas por cobrar desde SAP B1."
+          icon={Building2}
+          actions={
+            <>
+              <Button onClick={reload} disabled={isLoading} variant="outline" className="gap-2">
+                <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
+                {isLoading ? 'Cargando...' : 'Recargar'}
+              </Button>
+              <Button className="bg-accent hover:bg-accent/90">Acción de Cobro Masivo</Button>
+            </>
+          }
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border flex items-center gap-4">
-            <div className="p-3 bg-red-100 rounded-full">
-              <AlertCircle className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
-                Vencido
-              </p>
-              <h3 className="text-2xl font-headline font-bold text-primary">
-                ${overdueTotal.toLocaleString()}
-              </h3>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border flex items-center gap-4">
-            <div className="p-3 bg-orange-100 rounded-full">
-              <Clock className="w-6 h-6 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
-                Pendiente
-              </p>
-              <h3 className="text-2xl font-headline font-bold text-primary">
-                ${pendingTotal.toLocaleString()}
-              </h3>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border flex items-center gap-4">
-            <div className="p-3 bg-green-100 rounded-full">
-              <CheckCircle2 className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
-                Pagado
-              </p>
-              <h3 className="text-2xl font-headline font-bold text-primary">
-                ${paidTotal.toLocaleString()}
-              </h3>
-            </div>
-          </div>
+          <StatCard
+            label="Vencido"
+            value={`$${overdueTotal.toLocaleString()}`}
+            icon={AlertCircle}
+            tone="red"
+          />
+          <StatCard
+            label="Pendiente"
+            value={`$${pendingTotal.toLocaleString()}`}
+            icon={Clock}
+            tone="orange"
+          />
+          <StatCard
+            label="Pagado"
+            value={`$${paidTotal.toLocaleString()}`}
+            icon={CheckCircle2}
+            tone="green"
+          />
         </div>
 
         <div className="bg-white rounded-xl shadow-md p-6 border-none">
