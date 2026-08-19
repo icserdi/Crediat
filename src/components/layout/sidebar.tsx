@@ -11,6 +11,7 @@ import {
   Zap,
   LogOut,
   Building2,
+  CreditCard,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -58,6 +59,12 @@ const navItems = [
     label: 'Bandeja Unificada',
     href: '/interactions',
     roles: ['admin', 'supervisor', 'cobrador'],
+  },
+  {
+    icon: CreditCard,
+    label: 'Solicitudes de Crédito',
+    href: '/credit/applications',
+    roles: ['admin', 'supervisor'],
   },
   { icon: TrendingUp, label: 'IA Analítica', href: '/analytics', roles: ['admin', 'supervisor'] },
   { icon: ShieldCheck, label: 'Logs de Auditoría', href: '/audit', roles: ['admin'] },

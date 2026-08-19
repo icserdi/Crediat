@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-19T07:37:57.655Z
+- Última validación automática: 2026-08-19T15:48:38.418Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -119,6 +119,16 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [x] Mover lógica de negocio (fetch, localStorage, autenticación) fuera de los componentes de página hacia capas/servicios dedicados.
 
 ## Post-MVP — Funcionalidades a evaluar
+
+### Módulo de Solicitud de Crédito (integrado)
+
+- [x] Integrar criterios de solicitud de crédito de https://serdiaceros.com.mx/solicitud-de-credito/ (campos, requisitos documentales por persona física/moral).
+- [x] Crear formulario público en `/credit/apply` y listado en `/credit/applications`.
+- [x] Persistencia en `credit_applications` + auditoría de creación/cambio de estatus.
+- [x] Endpoints API `/api/credit/applications` (GET/POST) y `/[id]` (PATCH).
+- [x] Tests unitarios de validación y doc en `docs/credit-application.md`.
+- [ ] Validación de RFC (estatus fiscal SAT) — pendiente: evaluación de APIs (ver tabla).
+- [ ] Subida real de archivos adjuntos (hoy solo se registran los nombres; falta integrar almacenamiento, ej. MinIO).
 
 ### Validación de RFC (para módulo de crédito)
 

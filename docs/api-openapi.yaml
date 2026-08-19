@@ -104,7 +104,12 @@ paths:
       summary: Verifica la conexión con SAP Service Layer
       parameters:
         - { name: companyDb, in: query, schema: { type: string }, description: CompanyDB real }
-        - { name: companyId, in: query, schema: { type: string, format: uuid }, description: UUID interno de empresa }
+        - {
+            name: companyId,
+            in: query,
+            schema: { type: string, format: uuid },
+            description: UUID interno de empresa,
+          }
       responses:
         '200':
           description: Conexión SAP exitosa

@@ -70,8 +70,30 @@ export async function initializeDb(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_audit_logs_actor ON audit_logs(actor);
   `;
 
+  const createCreditApplications = `
+    CREATE TABLE IF NOT EXISTS credit_applications (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      person_type VARCHAR(20) NOT NULL CHECK (person_type IN ('fisica', 'moral')),
+      full_name VARCHAR(200) NOT NULL,
+      city VARCHAR(100) NOT NULL,
+      state VARCHAR(100) NOT NULL,
+      advisor VARCHAR(200) NOT NULL,
+      email VARCHAR(200) NOT NULL,
+      phone VARCHAR(50) NOT NULL,
+      status VARCHAR(30) NOT NULL DEFAULT 'recibida',
+      metadata JSONB DEFAULT '{}',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_credit_applications_created_at ON credit_applications(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_credit_applications_status ON credit_applications(status);
+    CREATE INDEX IF NOT EXISTS idx_credit_applications_email ON credit_applications(email);
+  `;
+
   await query(createInteractions);
   await query(createAuditLogs);
+  await query(createCreditApplications);
 }
 
 export async function logAuditEvent(params: {
