@@ -45,17 +45,51 @@ El sistema requiere conexión con SAP Business One v9.2 for HANA. Consultar el a
 
 ## Tecnología
 - **Frontend**: Next.js 15+, Tailwind CSS, Shadcn UI
-- **IA**: Genkit AI + Gemini 2.5 Flash
+- **IA**: Vercel AI SDK + OpenRouter (multi-modelo) / Microsoft Foundry (Azure AI Foundry)
 - **Integración**: SAP Service Layer (REST API)
 - **Seguridad**: Validación de dominios y Logs de Auditoría Inmutables.
 - **Contenedores**: Docker + Docker Compose (PostgreSQL + pgvector, Redis, MinIO, Next.js standalone)
+
+## Configuración de IA
+
+La capa de IA usa [Vercel AI SDK](https://sdk.vercel.ai) y soporta dos proveedores configurables vía `AI_PROVIDER`:
+
+### OpenRouter (default)
+Multi-modelo: acceso a cientos de modelos (Claude, GPT, Llama, DeepSeek, etc.) con una sola API key.
+
+```bash
+AI_PROVIDER=openrouter
+OPENROUTER_API_KEY=sk-or-v1-...
+OPENROUTER_MODEL=openrouter/auto   # o un modelo específico, ej. openai/gpt-4o-mini
+```
+
+Obtén tu key en https://openrouter.ai/settings/keys
+
+### Microsoft Foundry (Azure AI Foundry)
+Usa modelos desplegados en tu proyecto de Azure AI Foundry.
+
+```bash
+AI_PROVIDER=foundry
+AZURE_FOUNDRY_BASE_URL=https://<proyecto>.services.ai.azure.com
+AZURE_FOUNDRY_API_KEY=<clave-del-modelo>
+AZURE_FOUNDRY_DEPLOYMENT=<nombre-del-deployment>
+```
+
+### Endpoints de IA
+
+Los flujos de IA se exponen como rutas API:
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `POST /api/ai/predict-cash-flow` | Predice el flujo de caja futuro a partir de datos históricos |
+| `POST /api/ai/generate-message` | Genera un mensaje de cobranza personalizado por IA |
 
 ## Despliegue Local con Docker
 
 ```bash
 # 1. Configurar variables de entorno
 cp .env.example .env
-# Editar .env con credenciales reales (GEMINI_API_KEY, SAP_SERVICE_LAYER_*)
+# Editar .env con credenciales reales (OPENROUTER_API_KEY, SAP_SERVICE_LAYER_*)
 
 # 2. Levantar servicios
 docker compose up -d --build
