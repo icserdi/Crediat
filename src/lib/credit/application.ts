@@ -17,7 +17,9 @@ export type CreditApplicationInput = {
   advisor: string;
   email: string;
   phone: string;
-  /** Documentos adjuntos (nombres de archivo). */
+  /** Archivos a subir (solo en el cliente). */
+  files?: File[];
+  /** Claves de los archivos ya subidos a MinIO (uso interno). */
   attachments?: string[];
 };
 

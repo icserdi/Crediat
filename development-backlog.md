@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-19T15:48:38.418Z
+- Última validación automática: 2026-08-19T15:57:30.640Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -128,7 +128,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [x] Endpoints API `/api/credit/applications` (GET/POST) y `/[id]` (PATCH).
 - [x] Tests unitarios de validación y doc en `docs/credit-application.md`.
 - [ ] Validación de RFC (estatus fiscal SAT) — pendiente: evaluación de APIs (ver tabla).
-- [ ] Subida real de archivos adjuntos (hoy solo se registran los nombres; falta integrar almacenamiento, ej. MinIO).
+- [x] Subida real de archivos adjuntos con MinIO (capa `src/lib/storage/minio.ts`, endpoint multipart, bucket `crediat` vía `minio-init`).
 
 ### Validación de RFC (para módulo de crédito)
 

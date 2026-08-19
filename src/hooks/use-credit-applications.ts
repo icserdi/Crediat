@@ -39,10 +39,23 @@ export function useCreditApplications() {
     async (input: CreditApplicationInput): Promise<{ ok: boolean; message?: string }> => {
       setIsSubmitting(true);
       try {
+        const formData = new FormData();
+
+        Object.entries(input).forEach(([key, value]) => {
+          if (key === 'files') {
+            const files = value as unknown as File[];
+            files.forEach((file) => {
+              formData.append('files', file, file.name);
+            });
+          } else if (value !== undefined && value !== null) {
+            formData.append(key, String(value));
+          }
+        });
+
         const response = await fetch('/api/credit/applications', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(input),
+          body: formData,
+          // No fijar Content-Type manualmente: fetch define el multipart boundary
         });
         const data = await response.json();
         if (response.ok) {

@@ -19,7 +19,7 @@ type FormState = {
   advisor: string;
   email: string;
   phone: string;
-  attachments: string[];
+  files: File[];
 };
 
 const initialForm: FormState = {
@@ -30,7 +30,7 @@ const initialForm: FormState = {
   advisor: '',
   email: '',
   phone: '',
-  attachments: [],
+  files: [],
 };
 
 const ADVISORS = ['SERDI', 'Cobranza', 'Ventas', 'Otro'];
@@ -47,8 +47,8 @@ export default function CreditApplyPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []).map((f) => f.name);
-    setForm((prev) => ({ ...prev, attachments: files }));
+    const files = Array.from(e.target.files || []);
+    setForm((prev) => ({ ...prev, files }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,7 +61,7 @@ export default function CreditApplyPage() {
       advisor: form.advisor,
       email: form.email,
       phone: form.phone,
-      attachments: form.attachments,
+      files: form.files,
     });
 
     if (result.ok) {
@@ -255,10 +255,10 @@ export default function CreditApplyPage() {
                   Archivos adjuntos
                 </Label>
                 <Input type="file" multiple onChange={handleFileChange} />
-                {form.attachments.length > 0 && (
+                {form.files.length > 0 && (
                   <p className="text-xs text-muted-foreground">
-                    {form.attachments.length} archivo(s) seleccionado(s):{' '}
-                    {form.attachments.join(', ')}
+                    {form.files.length} archivo(s) seleccionado(s):{' '}
+                    {form.files.map((f) => f.name).join(', ')}
                   </p>
                 )}
               </div>

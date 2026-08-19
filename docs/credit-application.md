@@ -56,6 +56,9 @@ documentales varían según el tipo.
 - Los requisitos y la validación están implementados en `src/lib/credit/application.ts`.
 - Las solicitudes se persisten en la tabla `credit_applications` (ver `src/lib/db/index.ts`).
 - Cada creación/cambio de estatus registra un evento en el Ledger de Auditoría.
+- Los archivos adjuntos se suben a **MinIO** (capa `src/lib/storage/minio.ts`) al bucket `crediat`,
+  en la carpeta `credit-applications/`. El bucket se crea automáticamente al levantar docker
+  (servicio `minio-init`). Si MinIO no está configurado, la solicitud se guarda sin archivos.
 
 ## Endpoints
 
