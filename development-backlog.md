@@ -3,7 +3,7 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-08-19T00:15:07.507Z
+- Última validación automática: 2026-08-19T06:00:46.314Z
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
@@ -93,7 +93,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 ### Pruebas
 - [x] Agregar cobertura de código con `@vitest/coverage-v8` y umbral mínimo (80% stmts/lines/funcs, 70% branch) sobre la lógica crítica (auth + capa SAP).
 - [x] Pruebas de integración para el cliente SAP (`src/lib/sap/client.ts`) con `fetch` mockeado.
-- [ ] Pruebas E2E con Playwright/Cypress para flujos críticos (login OTP, navegación, dashboard).
+- [x] Pruebas E2E con Playwright para flujos críticos (login OTP, navegación).
 
 ### Infraestructura y observabilidad
 - [ ] Agregar `healthcheck` a los servicios de `docker-compose.yml` (db, redis, minio, app).
