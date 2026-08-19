@@ -26,8 +26,7 @@ export async function GET(
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',
-        message:
-          error instanceof Error ? error.message : 'Error al obtener asignación',
+        message: error instanceof Error ? error.message : 'Error al obtener asignación',
       },
       { status: 500 }
     );
@@ -59,8 +58,7 @@ export async function DELETE(
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',
-        message:
-          error instanceof Error ? error.message : 'Error al eliminar asignación',
+        message: error instanceof Error ? error.message : 'Error al eliminar asignación',
       },
       { status: 500 }
     );

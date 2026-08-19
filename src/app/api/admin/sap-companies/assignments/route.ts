@@ -25,8 +25,7 @@ export async function GET() {
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',
-        message:
-          error instanceof Error ? error.message : 'Error al listar asignaciones',
+        message: error instanceof Error ? error.message : 'Error al listar asignaciones',
       },
       { status: 500 }
     );
@@ -62,19 +61,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ assignment }, { status: 201 });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Error al crear asignación';
+    const message = error instanceof Error ? error.message : 'Error al crear asignación';
 
     if (message.includes('no existe')) {
-      return NextResponse.json(
-        { error: 'COMPANY_NOT_FOUND', message },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'COMPANY_NOT_FOUND', message }, { status: 404 });
     }
 
-    return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'INTERNAL_ERROR', message }, { status: 500 });
   }
 }

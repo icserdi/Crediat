@@ -106,8 +106,6 @@ export function mapHttpStatusToSapError(
   });
 }
 
-export function isSapServiceLayerError(
-  error: unknown
-): error is SapServiceLayerError {
+export function isSapServiceLayerError(error: unknown): error is SapServiceLayerError {
   return error instanceof SapServiceLayerError;
 }

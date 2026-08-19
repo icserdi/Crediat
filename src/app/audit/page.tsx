@@ -1,29 +1,29 @@
 'use client';
 
-import { Sidebar } from "@/components/layout/sidebar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { 
-  ShieldCheck, 
-  Database, 
-  Zap, 
-  LogIn, 
+import { Sidebar } from '@/components/layout/sidebar';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import {
+  ShieldCheck,
+  Database,
+  Zap,
+  LogIn,
   Key,
   RefreshCw,
   AlertCircle,
-  Building2
-} from "lucide-react";
-import { useAudit } from "@/hooks/use-audit";
+  Building2,
+} from 'lucide-react';
+import { useAudit } from '@/hooks/use-audit';
 
 export default function AuditPage() {
   const { logs, stats, isLoading, error, reload } = useAudit();
@@ -37,7 +37,9 @@ export default function AuditPage() {
             <h2 className="text-4xl font-headline font-bold text-primary">Logs de Auditoría</h2>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Building2 className="w-4 h-4" />
-              <p className="text-lg italic">Registro inmutable de todas las intervenciones manuales, IA y accesos.</p>
+              <p className="text-lg italic">
+                Registro inmutable de todas las intervenciones manuales, IA y accesos.
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -45,8 +47,14 @@ export default function AuditPage() {
               <ShieldCheck className="w-4 h-4" />
               Append-Only: ACTIVA
             </Badge>
-            <Button onClick={reload} disabled={isLoading} variant="outline" size="sm" className="gap-2">
-              <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+            <Button
+              onClick={reload}
+              disabled={isLoading}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
               Recargar
             </Button>
           </div>
@@ -55,7 +63,9 @@ export default function AuditPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="border-none shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription className="text-xs font-bold uppercase text-muted-foreground">Inicios de Sesión</CardDescription>
+              <CardDescription className="text-xs font-bold uppercase text-muted-foreground">
+                Inicios de Sesión
+              </CardDescription>
               <CardTitle className="text-2xl font-headline flex items-center gap-2">
                 <LogIn className="w-5 h-5 text-green-500" />
                 {stats.logins}
@@ -64,7 +74,9 @@ export default function AuditPage() {
           </Card>
           <Card className="border-none shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription className="text-xs font-bold uppercase text-muted-foreground">Escrituras SAP/UDF</CardDescription>
+              <CardDescription className="text-xs font-bold uppercase text-muted-foreground">
+                Escrituras SAP/UDF
+              </CardDescription>
               <CardTitle className="text-2xl font-headline flex items-center gap-2">
                 <Key className="w-5 h-5 text-orange-500" />
                 {stats.writes}
@@ -73,7 +85,9 @@ export default function AuditPage() {
           </Card>
           <Card className="border-none shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription className="text-xs font-bold uppercase text-muted-foreground">Invocaciones IA</CardDescription>
+              <CardDescription className="text-xs font-bold uppercase text-muted-foreground">
+                Invocaciones IA
+              </CardDescription>
               <CardTitle className="text-2xl font-headline flex items-center gap-2">
                 <Zap className="w-5 h-5 text-blue-500" />
                 {stats.iaInvocations}
@@ -82,7 +96,9 @@ export default function AuditPage() {
           </Card>
           <Card className="border-none shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription className="text-xs font-bold uppercase text-muted-foreground">Total Eventos</CardDescription>
+              <CardDescription className="text-xs font-bold uppercase text-muted-foreground">
+                Total Eventos
+              </CardDescription>
               <CardTitle className="text-2xl font-headline flex items-center gap-2">
                 <Database className="w-5 h-5 text-primary" />
                 {logs.length}
@@ -118,37 +134,58 @@ export default function AuditPage() {
                 <TableBody>
                   {logs.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="py-20 text-center text-muted-foreground italic">
+                      <TableCell
+                        colSpan={6}
+                        className="py-20 text-center text-muted-foreground italic"
+                      >
                         No hay eventos de auditoría registrados.
                       </TableCell>
                     </TableRow>
-                  ) : logs.map((log) => (
-                    <TableRow key={log.id} className="hover:bg-muted/30">
-                      <TableCell className="font-semibold text-primary">
-                        <div className="flex items-center gap-2">
-                          {log.event_type?.toLowerCase().includes('sesión') || log.event_type?.toLowerCase().includes('login') ? <LogIn className="w-3 h-3 text-muted-foreground" /> : null}
-                          {log.event_type?.toLowerCase().includes('write') || log.event_type?.toLowerCase().includes('udf') || log.event_type?.toLowerCase().includes('promise') ? <Key className="w-3 h-3 text-muted-foreground" /> : null}
-                          {log.event_type}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs font-bold">{log.actor}</TableCell>
-                      <TableCell className="font-medium text-xs">{log.entity_id || '-'}</TableCell>
-                      <TableCell className="max-w-xs truncate text-xs text-muted-foreground">{log.description}</TableCell>
-                      <TableCell className="text-[10px] font-mono whitespace-nowrap">
-                        {new Date(log.created_at).toLocaleString()}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={cn(
-                          "text-[10px] uppercase font-bold",
-                          log.severity === 'error' || log.severity === 'alta' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                          log.severity === 'success' || log.severity === 'éxito' ? 'bg-green-50 text-green-700 border-green-200' :
-                          'bg-slate-50 text-slate-700 border-slate-200'
-                        )}>
-                          {log.severity}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  ) : (
+                    logs.map((log) => (
+                      <TableRow key={log.id} className="hover:bg-muted/30">
+                        <TableCell className="font-semibold text-primary">
+                          <div className="flex items-center gap-2">
+                            {log.event_type?.toLowerCase().includes('sesión') ||
+                            log.event_type?.toLowerCase().includes('login') ? (
+                              <LogIn className="w-3 h-3 text-muted-foreground" />
+                            ) : null}
+                            {log.event_type?.toLowerCase().includes('write') ||
+                            log.event_type?.toLowerCase().includes('udf') ||
+                            log.event_type?.toLowerCase().includes('promise') ? (
+                              <Key className="w-3 h-3 text-muted-foreground" />
+                            ) : null}
+                            {log.event_type}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs font-bold">{log.actor}</TableCell>
+                        <TableCell className="font-medium text-xs">
+                          {log.entity_id || '-'}
+                        </TableCell>
+                        <TableCell className="max-w-xs truncate text-xs text-muted-foreground">
+                          {log.description}
+                        </TableCell>
+                        <TableCell className="text-[10px] font-mono whitespace-nowrap">
+                          {new Date(log.created_at).toLocaleString()}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              'text-[10px] uppercase font-bold',
+                              log.severity === 'error' || log.severity === 'alta'
+                                ? 'bg-orange-50 text-orange-700 border-orange-200'
+                                : log.severity === 'success' || log.severity === 'éxito'
+                                  ? 'bg-green-50 text-green-700 border-green-200'
+                                  : 'bg-slate-50 text-slate-700 border-slate-200'
+                            )}
+                          >
+                            {log.severity}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>

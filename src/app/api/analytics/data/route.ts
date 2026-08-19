@@ -85,7 +85,13 @@ export async function GET(request: NextRequest) {
     let alto = 0;
     const total = customers.length;
     for (const c of customers) {
-      if (c.CreditLimit && c.CreditLimit > 0 && c.CurrentAccountBalance && c.CurrentAccountBalance > c.CreditLimit * 0.8) alto++;
+      if (
+        c.CreditLimit &&
+        c.CreditLimit > 0 &&
+        c.CurrentAccountBalance &&
+        c.CurrentAccountBalance > c.CreditLimit * 0.8
+      )
+        alto++;
     }
 
     // Monthly trend (last 6 months from closed invoices)
@@ -106,9 +112,10 @@ export async function GET(request: NextRequest) {
       const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
       const monthData = monthlyMap.get(key) || { recovered: 0, total: 1 };
-      const recoveryRate = monthData.recovered > 0
-        ? Math.round((monthData.recovered / (monthData.recovered + totalAr * 0.1)) * 100)
-        : 70 + Math.floor(Math.random() * 15);
+      const recoveryRate =
+        monthData.recovered > 0
+          ? Math.round((monthData.recovered / (monthData.recovered + totalAr * 0.1)) * 100)
+          : 70 + Math.floor(Math.random() * 15);
       monthlyTrend.push({
         month: MONTHS[d.getMonth()],
         recovery: Math.min(100, recoveryRate),
@@ -128,18 +135,19 @@ export async function GET(request: NextRequest) {
     }
 
     // Insights
-    const insights: { title: string; description: string; type: 'info' | 'warning' | 'success' }[] = [
-      {
-        title: 'Resumen de Cartera',
-        description: `${total} deudores activos con AR total de $${totalAr.toLocaleString()}. ${alto} cuentas en riesgo alto (>80% límite).`,
-        type: alto > 5 ? 'warning' as const : 'info',
-      },
-      {
-        title: 'Tendencia de Recuperación',
-        description: `Tasa de recuperación actual: ${totalRecoverable > 0 ? Math.round((totalRecovered / totalRecoverable) * 100) : 0}% basada en ${closedInv.length} facturas pagadas vs ${openInv.length} abiertas.`,
-        type: 'info' as const,
-      },
-    ];
+    const insights: { title: string; description: string; type: 'info' | 'warning' | 'success' }[] =
+      [
+        {
+          title: 'Resumen de Cartera',
+          description: `${total} deudores activos con AR total de $${totalAr.toLocaleString()}. ${alto} cuentas en riesgo alto (>80% límite).`,
+          type: alto > 5 ? ('warning' as const) : 'info',
+        },
+        {
+          title: 'Tendencia de Recuperación',
+          description: `Tasa de recuperación actual: ${totalRecoverable > 0 ? Math.round((totalRecovered / totalRecoverable) * 100) : 0}% basada en ${closedInv.length} facturas pagadas vs ${openInv.length} abiertas.`,
+          type: 'info' as const,
+        },
+      ];
 
     // Add insight about cash flow
     if (cashFlowProjection.length > 0) {
@@ -169,7 +177,8 @@ export async function GET(request: NextRequest) {
     const result: AnalyticsData = {
       kpi: {
         morosidad: total > 0 ? Math.round((alto / total) * 1000) / 10 : 0,
-        recuperacion: totalRecoverable > 0 ? Math.round((totalRecovered / totalRecoverable) * 1000) / 10 : 0,
+        recuperacion:
+          totalRecoverable > 0 ? Math.round((totalRecovered / totalRecoverable) * 1000) / 10 : 0,
         rotacion: totalAr > 0 ? Math.round(((totalRecovered + totalAr) / totalAr) * 10) / 10 : 0,
       },
       cashFlowProjection,
@@ -189,7 +198,10 @@ export async function GET(request: NextRequest) {
       );
     }
     return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message: error instanceof Error ? error.message : 'Error inesperado' },
+      {
+        error: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Error inesperado',
+      },
       { status: 500 }
     );
   }

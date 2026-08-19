@@ -1,18 +1,26 @@
 'use client';
 
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { Zap, ShieldCheck, Mail, Lock, ArrowRight } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { Zap, ShieldCheck, Mail, Lock, ArrowRight } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { email, setEmail, code, setCode, step, isLoading, sendCode, verifyCode, goBack } = useAuth();
+  const { email, setEmail, code, setCode, step, isLoading, sendCode, verifyCode, goBack } =
+    useAuth();
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,20 +28,20 @@ export default function LoginPage() {
 
     if (result.ok) {
       toast({
-        title: "Código enviado",
+        title: 'Código enviado',
         description: result.message || `Código enviado a ${email}`,
       });
     } else if (result.status === 403) {
       toast({
-        title: "Dominio no autorizado",
-        description: "Solo se permiten correos de dominios corporativos autorizados.",
-        variant: "destructive",
+        title: 'Dominio no autorizado',
+        description: 'Solo se permiten correos de dominios corporativos autorizados.',
+        variant: 'destructive',
       });
     } else {
       toast({
-        title: "Error",
+        title: 'Error',
         description: result.message || 'Error al enviar código',
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -45,23 +53,23 @@ export default function LoginPage() {
     if (result.ok) {
       const role = localStorage.getItem('userRole') || 'cobrador';
       toast({
-        title: "Acceso concedido",
+        title: 'Acceso concedido',
         description: `Iniciando sesión como ${role.toUpperCase()}...`,
       });
-      router.push("/");
+      router.push('/');
     } else {
       toast({
-        title: "Código inválido",
-        description: result.message || "El código ingresado no es correcto.",
-        variant: "destructive",
+        title: 'Código inválido',
+        description: result.message || 'El código ingresado no es correcto.',
+        variant: 'destructive',
       });
     }
   };
 
   const handleRecovery = () => {
     toast({
-      title: "Recuperación enviada",
-      description: "Si el correo está registrado, recibirá instrucciones en breve.",
+      title: 'Recuperación enviada',
+      description: 'Si el correo está registrado, recibirá instrucciones en breve.',
     });
   };
 
@@ -73,17 +81,19 @@ export default function LoginPage() {
             <Zap className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl font-headline font-bold text-primary">Crediat</h1>
-          <p className="text-muted-foreground font-medium uppercase tracking-widest text-[10px]">Gestión Inteligente de Crédito y Cobranza</p>
+          <p className="text-muted-foreground font-medium uppercase tracking-widest text-[10px]">
+            Gestión Inteligente de Crédito y Cobranza
+          </p>
         </div>
 
         <Card className="border-none shadow-2xl rounded-3xl overflow-hidden">
           <CardHeader className="bg-primary/5 p-8 border-b text-center">
             <CardTitle className="text-xl font-headline text-primary">
-              {step === 1 ? "Acceso al Sistema" : "Validar Identidad"}
+              {step === 1 ? 'Acceso al Sistema' : 'Validar Identidad'}
             </CardTitle>
             <CardDescription>
-              {step === 1 
-                ? "Ingresa tu correo corporativo para continuar" 
+              {step === 1
+                ? 'Ingresa tu correo corporativo para continuar'
                 : `Ingresa el código enviado a ${email}`}
             </CardDescription>
           </CardHeader>
@@ -91,40 +101,52 @@ export default function LoginPage() {
             {step === 1 ? (
               <form onSubmit={handleSendCode} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Correo Institucional</Label>
+                  <Label
+                    htmlFor="email"
+                    className="font-bold text-xs uppercase tracking-widest text-muted-foreground"
+                  >
+                    Correo Institucional
+                  </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input 
+                    <Input
                       id="email"
-                      type="email" 
-                      placeholder="usuario@serdi.com.mx" 
+                      type="email"
+                      placeholder="usuario@serdi.com.mx"
                       className="pl-10 h-12 rounded-xl bg-muted/20 border-primary/5 focus:ring-accent"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground italic">Acceso restringido a dominios autorizados.</p>
+                  <p className="text-[10px] text-muted-foreground italic">
+                    Acceso restringido a dominios autorizados.
+                  </p>
                 </div>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold gap-2 shadow-xl shadow-primary/20"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Enviando código..." : "Siguiente"}
+                  {isLoading ? 'Enviando código...' : 'Siguiente'}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </form>
             ) : (
               <form onSubmit={handleVerifyCode} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="code" className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Código de Validación</Label>
+                  <Label
+                    htmlFor="code"
+                    className="font-bold text-xs uppercase tracking-widest text-muted-foreground"
+                  >
+                    Código de Validación
+                  </Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input 
+                    <Input
                       id="code"
-                      type="text" 
-                      placeholder="000000" 
+                      type="text"
+                      placeholder="000000"
                       maxLength={6}
                       className="pl-10 h-12 rounded-xl bg-muted/20 border-primary/5 font-mono text-center tracking-[1em] text-lg focus:ring-accent"
                       value={code}
@@ -133,15 +155,15 @@ export default function LoginPage() {
                     />
                   </div>
                 </div>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isLoading}
                   className="w-full h-12 rounded-xl bg-accent hover:bg-accent/90 font-bold gap-2 shadow-xl shadow-accent/20"
                 >
-                  {isLoading ? "Validando..." : "Acceder"}
+                  {isLoading ? 'Validando...' : 'Acceder'}
                   <ShieldCheck className="w-4 h-4" />
                 </Button>
-                <button 
+                <button
                   type="button"
                   onClick={goBack}
                   className="w-full text-xs text-muted-foreground hover:text-primary transition-colors font-bold"
@@ -152,7 +174,7 @@ export default function LoginPage() {
             )}
           </CardContent>
           <CardFooter className="bg-muted/5 p-6 border-t flex flex-col gap-2">
-            <button 
+            <button
               onClick={handleRecovery}
               className="text-xs font-bold text-primary hover:text-accent transition-colors"
             >

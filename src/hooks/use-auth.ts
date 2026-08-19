@@ -14,7 +14,11 @@ export function useAuth() {
   const [step, setStep] = useState<AuthStep>(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  const sendCode = useCallback(async (): Promise<{ ok: boolean; message?: string; status?: number }> => {
+  const sendCode = useCallback(async (): Promise<{
+    ok: boolean;
+    message?: string;
+    status?: number;
+  }> => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/auth/send-otp', {

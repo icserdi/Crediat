@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import {
-  withRetry,
-  defaultShouldRetry,
-  wrapNetworkError,
-} from './retry';
+import { withRetry, defaultShouldRetry, wrapNetworkError } from './retry';
 import { SapServiceLayerError } from './errors';
 
 describe('withRetry', () => {
@@ -23,10 +19,7 @@ describe('withRetry', () => {
   });
 
   it('reintenta hasta tener éxito', async () => {
-    const fn = vi
-      .fn()
-      .mockRejectedValueOnce(new Error('boom'))
-      .mockResolvedValueOnce('recovered');
+    const fn = vi.fn().mockRejectedValueOnce(new Error('boom')).mockResolvedValueOnce('recovered');
     const result = await withRetry(fn, {
       maxAttempts: 3,
       baseDelayMs: 1,

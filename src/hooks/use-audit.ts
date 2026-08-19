@@ -29,7 +29,12 @@ export type AuditStats = {
  */
 export function useAudit() {
   const [logs, setLogs] = useState<AuditEvent[]>([]);
-  const [stats, setStats] = useState<AuditStats>({ logins: 0, logouts: 0, iaInvocations: 0, writes: 0 });
+  const [stats, setStats] = useState<AuditStats>({
+    logins: 0,
+    logouts: 0,
+    iaInvocations: 0,
+    writes: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

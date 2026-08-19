@@ -22,9 +22,7 @@ export async function withRetry<T>(
       return await fn(attempt);
     } catch (error) {
       lastError = error;
-      const canRetry =
-        attempt < options.maxAttempts &&
-        options.shouldRetry(error, attempt);
+      const canRetry = attempt < options.maxAttempts && options.shouldRetry(error, attempt);
 
       if (!canRetry) break;
 

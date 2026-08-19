@@ -6,18 +6,9 @@ export {
   type SapErrorDetails,
 } from './errors';
 
-export {
-  loadSapConfig,
-  isSapConfigured,
-  resetSapConfigCache,
-  type SapConfig,
-} from './config';
+export { loadSapConfig, isSapConfigured, resetSapConfigCache, type SapConfig } from './config';
 
-export {
-  SapServiceLayerClient,
-  getSapClient,
-  resetSapClient,
-} from './client';
+export { SapServiceLayerClient, getSapClient, resetSapClient } from './client';
 
 export { SapSessionManager } from './session-manager';
 

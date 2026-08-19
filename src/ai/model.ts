@@ -19,11 +19,9 @@ import { createAzure } from '@ai-sdk/azure';
 
 export const AI_PROVIDER = process.env.AI_PROVIDER || 'openrouter';
 
-export const MODEL_ID =
-  process.env.OPENROUTER_MODEL || 'openrouter/auto';
+export const MODEL_ID = process.env.OPENROUTER_MODEL || 'openrouter/auto';
 
-export const FOUNDRY_DEPLOYMENT =
-  process.env.AZURE_FOUNDRY_DEPLOYMENT || '';
+export const FOUNDRY_DEPLOYMENT = process.env.AZURE_FOUNDRY_DEPLOYMENT || '';
 
 function createModel() {
   if (AI_PROVIDER === 'foundry') {

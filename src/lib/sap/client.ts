@@ -1,16 +1,8 @@
 import { loadSapConfig, type SapConfig } from './config';
-import {
-  SapServiceLayerError,
-  isSapServiceLayerError,
-  mapHttpStatusToSapError,
-} from './errors';
+import { SapServiceLayerError, isSapServiceLayerError, mapHttpStatusToSapError } from './errors';
 import { SapSessionManager } from './session-manager';
 import { defaultShouldRetry, withRetry, wrapNetworkError } from './retry';
-import type {
-  SapHealthResult,
-  SapRequestOptions,
-  SapServiceLayerErrorBody,
-} from './types';
+import type { SapHealthResult, SapRequestOptions, SapServiceLayerErrorBody } from './types';
 
 const IDEMPOTENT_METHODS = new Set(['GET', 'PUT', 'DELETE']);
 
@@ -55,23 +47,19 @@ export class SapServiceLayerClient {
           shouldRetry: () => false,
         };
 
-    return withRetry(
-      async (attempt) => {
-        try {
-          return await this.executeRequest<T>(options, companyDb, attempt > 1);
-        } catch (error) {
-          if (
-            isSapServiceLayerError(error) &&
-            (error.code === 'SAP_AUTH_FAILED' ||
-              error.code === 'SAP_SESSION_EXPIRED')
-          ) {
-            this.sessions.invalidate(companyDb);
-          }
-          throw error;
+    return withRetry(async (attempt) => {
+      try {
+        return await this.executeRequest<T>(options, companyDb, attempt > 1);
+      } catch (error) {
+        if (
+          isSapServiceLayerError(error) &&
+          (error.code === 'SAP_AUTH_FAILED' || error.code === 'SAP_SESSION_EXPIRED')
+        ) {
+          this.sessions.invalidate(companyDb);
         }
-      },
-      retryOptions
-    );
+        throw error;
+      }
+    }, retryOptions);
   }
 
   async healthCheck(companyDb?: string): Promise<SapHealthResult> {
@@ -87,11 +75,11 @@ export class SapServiceLayerClient {
 
     if (!response.ok) {
       const { message } = await parseSapErrorBody(response);
-      throw mapHttpStatusToSapError(
-        response.status,
-        message,
-        { companyDb: db, httpStatus: response.status, path: '/BusinessPartners?$top=0' }
-      );
+      throw mapHttpStatusToSapError(response.status, message, {
+        companyDb: db,
+        httpStatus: response.status,
+        path: '/BusinessPartners?$top=0',
+      });
     }
 
     let version: string | undefined;
@@ -135,8 +123,7 @@ export class SapServiceLayerClient {
           ...this.sessions.cookieHeaders(session.cookies),
           ...options.headers,
         },
-        body:
-          options.body !== undefined ? JSON.stringify(options.body) : undefined,
+        body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
         signal: AbortSignal.timeout(this.config.timeoutMs),
       });
 

@@ -53,9 +53,9 @@ export function loadSapConfig(): SapConfig {
 export function isSapConfigured(): boolean {
   return Boolean(
     process.env.SAP_SERVICE_LAYER_BASE_URL &&
-      process.env.SAP_SERVICE_LAYER_USER &&
-      process.env.SAP_SERVICE_LAYER_PASSWORD &&
-      process.env.SAP_SERVICE_LAYER_DEFAULT_COMPANY_DB
+    process.env.SAP_SERVICE_LAYER_USER &&
+    process.env.SAP_SERVICE_LAYER_PASSWORD &&
+    process.env.SAP_SERVICE_LAYER_DEFAULT_COMPANY_DB
   );
 }
 

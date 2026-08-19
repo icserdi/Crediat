@@ -38,7 +38,9 @@ export function useDebtorDetail(companyId: string, debtorId: string) {
   }, [loadInteractions]);
 
   const registerPromise = useCallback(
-    async (promiseDate: string): Promise<{ ok: boolean; message?: string; sapWritten?: boolean }> => {
+    async (
+      promiseDate: string
+    ): Promise<{ ok: boolean; message?: string; sapWritten?: boolean }> => {
       if (!promiseDate || !companyId) {
         return { ok: false, message: 'Seleccione una fecha de promesa.' };
       }

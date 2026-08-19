@@ -12,7 +12,10 @@ export async function POST(request: NextRequest) {
     const { email, otp } = await request.json();
 
     if (!email || !otp) {
-      return NextResponse.json({ error: 'VALIDATION_ERROR', message: 'Email y OTP requeridos' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'VALIDATION_ERROR', message: 'Email y OTP requeridos' },
+        { status: 400 }
+      );
     }
 
     const valid = verifyOtp(email, otp);
@@ -25,7 +28,10 @@ export async function POST(request: NextRequest) {
         description: `OTP inválido o expirado para ${email}`,
         metadata: { email },
       });
-      return NextResponse.json({ error: 'INVALID_OTP', message: 'Código inválido o expirado' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'INVALID_OTP', message: 'Código inválido o expirado' },
+        { status: 401 }
+      );
     }
 
     const role = inferRole(email);
@@ -46,7 +52,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message: error instanceof Error ? error.message : 'Error al verificar OTP' },
+      {
+        error: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Error al verificar OTP',
+      },
       { status: 500 }
     );
   }

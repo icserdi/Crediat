@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import {
-  getSapCompaniesStore,
-  resetSapCompaniesStore,
-} from './companies-store';
+import { getSapCompaniesStore, resetSapCompaniesStore } from './companies-store';
 import { resetSapConfigCache } from './config';
 
 // El store inicializa datos demo usando loadSapConfig(), que requiere
@@ -106,8 +103,6 @@ describe('SapCompaniesStore', () => {
 
   it('rechaza asignar empresas inexistentes', () => {
     const store = getSapCompaniesStore();
-    expect(() =>
-      store.setUserAssignment('user-1', ['no-existe'], 'admin')
-    ).toThrow(/no existe/);
+    expect(() => store.setUserAssignment('user-1', ['no-existe'], 'admin')).toThrow(/no existe/);
   });
 });

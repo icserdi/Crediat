@@ -3,11 +3,15 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-08-19T06:43:06.125Z
+
+- Última validación automática: 2026-08-19T07:08:42.668Z
+
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
+
 - Próximo paso sugerido: continuar Sprint 0: conector SAP B1, catálogo de empresas y reglas de acceso por usuario.
+
 <!-- AUTO:NEXT_STEP_END -->
 
 ## Estado por sprint (vs roadmap)
@@ -49,6 +53,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [ ] Crear endpoint de facturas y poblar módulo `/invoices` con datos reales de SAP.
 
 ### Correcciones técnicas aplicadas (Jun 2026)
+
 - [x] Healthcheck SAP: `BusinessPartners?$top=0` en lugar de `UsersService_GetCurrentUser` (no existe en v9.2)
 - [x] Filtro CardType: `'cCustomer'` (enum `BoCardTypes`) en lugar de `'c'`
 - [x] Campos SAP reales: `EmailAddress`, `CreditLimit`, `CurrentAccountBalance` (no `E_Mail`, `CreditLine`, `Balance`)
@@ -69,38 +74,45 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 ## Mejores prácticas de desarrollo — pendiente
 
 ### CI/CD e integración continua
+
 - [x] Crear pipeline de GitHub Actions (`.github/workflows/ci.yml`) que corra en cada push/PR: `npm ci` → `lint` → `typecheck` → `test` → `build`.
 - [ ] Configurar branch protection en `main` (requerir PRs, checks obligatorios, sin push directo). **Pausado 2026-08-16**: desactivada temporalmente para avanzar rápido; retomar más adelante.
 - [x] Agregar badge de estado del CI al README.
 
 ### Git hooks y calidad de código
+
 - [x] Agregar pre-commit hook que corra lint + typecheck + tests antes de permitir el commit (hoy solo hay post-commit).
 - [x] Integrar Husky + lint-staged para que el pre-commit solo valide archivos modificados (rápido).
 - [x] Formalizar Conventional Commits con commitlint + generación de changelog automático.
-- [ ] Agregar Prettier como formateador consistente (no hay config actualmente).
+- [x] Agregar Prettier como formateador consistente (no hay config actualmente).
 
 ### Seguridad y secretos
+
 - [x] Eliminar credenciales hardcodeadas de `docker-compose.yml` (`password123`, `minioadminpassword`) y moverlas a variables de entorno / secrets.
 - [x] Mitigar vulnerabilidades de `npm audit` eliminando genkit (62 transitivas resueltas). Quedan 3 altas de `sharp` (dependencia de Next.js), con fix vía `next@16` (breaking change) pendiente.
 - [ ] Evaluar gestor de secretos para producción (no exponer `.env` ni claves en el repo).
 
 ### Migración de IA (genkit → Vercel AI SDK)
+
 - [x] Migrar `src/ai/` de genkit a Vercel AI SDK + OpenRouter (proveedor multi-modelo). Eliminó las vulnerabilidades transitivas de genkit.
 - [x] Agregar soporte de Microsoft Foundry (Azure AI Foundry) como segundo proveedor vía `@ai-sdk/azure`.
 - [x] Conectar los flujos de IA (predictCashFlow, generateCollectionMessage) a rutas API para uso real desde la UI.
 - [x] Documentar configuración de OpenRouter/Foundry en README (OPENROUTER_API_KEY, OPENROUTER_MODEL).
 
 ### Pruebas
+
 - [x] Agregar cobertura de código con `@vitest/coverage-v8` y umbral mínimo (80% stmts/lines/funcs, 70% branch) sobre la lógica crítica (auth + capa SAP).
 - [x] Pruebas de integración para el cliente SAP (`src/lib/sap/client.ts`) con `fetch` mockeado.
 - [x] Pruebas E2E con Playwright para flujos críticos (login OTP, navegación).
 
 ### Infraestructura y observabilidad
+
 - [ ] Agregar `healthcheck` a los servicios de `docker-compose.yml` (db, redis, minio, app).
 - [ ] Logging estructurado, métricas y tracing (OpenTelemetry) para producción.
 - [ ] Documentación de API con OpenAPI/Swagger para los endpoints.
 
 ### Desacoplamiento UI ↔ código funcional
+
 - [x] Refactorizar páginas hacia separación contenedor/presentación: componentes de presentación puros que reciban datos por props, y hooks de datos separados (fetch/estado fuera del JSX).
 - [ ] Extraer clases utilitarias repetidas en las páginas hacia componentes/tokens reutilizables (hoy hay `rounded-3xl`, `shadow-2xl`, `text-[10px]`, etc. hardcodeados).
 - [ ] Centralizar el diseño en tokens de tema (ya hay variables CSS para colores/fuentes) para que un rediseño no toque código funcional.
@@ -109,12 +121,13 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 ## Post-MVP — Funcionalidades a evaluar
 
 ### Validación de RFC (para módulo de crédito)
+
 No implementada porque la validación fiscal se realiza en sucursal/punto de venta antes del registro del cliente. Queda como referencia para futura integración:
 
-| API | URL | Descripción |
-|-----|-----|-------------|
-| CS Facturación | https://developers.csfacturacion.com/verifica-rfc | Validación de RFC + estatus fiscal |
-| Origoid | https://origoid.com | Validación de identidad y RFC |
-| API Market | https://apimarket.mx/ | Marketplace de APIs, incluye validación SAT |
-| SAT Go | https://sat-go.com/informacion-fiscal-rfc | Consulta de información fiscal |
-| Facturo por Ti | https://developers.facturoporti.com.mx/reference/validar-listas-negras-efos-sat | Validación contra listas negras EFOS/SAT |
+| API            | URL                                                                             | Descripción                                 |
+| -------------- | ------------------------------------------------------------------------------- | ------------------------------------------- |
+| CS Facturación | https://developers.csfacturacion.com/verifica-rfc                               | Validación de RFC + estatus fiscal          |
+| Origoid        | https://origoid.com                                                             | Validación de identidad y RFC               |
+| API Market     | https://apimarket.mx/                                                           | Marketplace de APIs, incluye validación SAT |
+| SAT Go         | https://sat-go.com/informacion-fiscal-rfc                                       | Consulta de información fiscal              |
+| Facturo por Ti | https://developers.facturoporti.com.mx/reference/validar-listas-negras-efos-sat | Validación contra listas negras EFOS/SAT    |

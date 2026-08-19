@@ -103,10 +103,7 @@ export class SapSessionManager {
     }
 
     const sessionTimeoutMinutes = loginPayload.SessionTimeout ?? 30;
-    const ttlMs = Math.min(
-      this.config.sessionTtlMs,
-      sessionTimeoutMinutes * 60 * 1000
-    );
+    const ttlMs = Math.min(this.config.sessionTtlMs, sessionTimeoutMinutes * 60 * 1000);
 
     const record: SapSessionRecord = {
       companyDb,
@@ -132,7 +129,7 @@ function extractSessionCookies(response: Response): SapSessionCookies {
   const setCookies =
     typeof response.headers.getSetCookie === 'function'
       ? response.headers.getSetCookie()
-      : [response.headers.get('set-cookie')].filter(Boolean) as string[];
+      : ([response.headers.get('set-cookie')].filter(Boolean) as string[]);
 
   const cookies: SapSessionCookies = { B1SESSION: '' };
 

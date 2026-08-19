@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateCollectionMessage, type GenerateCollectionMessageInput } from '@/ai/flows/generate-collection-message-flow';
+import {
+  generateCollectionMessage,
+  type GenerateCollectionMessageInput,
+} from '@/ai/flows/generate-collection-message-flow';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +26,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
-      { error: 'AI_ERROR', message: error instanceof Error ? error.message : 'Error al generar mensaje' },
+      {
+        error: 'AI_ERROR',
+        message: error instanceof Error ? error.message : 'Error al generar mensaje',
+      },
       { status: 500 }
     );
   }

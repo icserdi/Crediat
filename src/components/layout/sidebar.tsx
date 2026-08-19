@@ -1,30 +1,30 @@
 'use client';
 
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  MessageSquare, 
-  TrendingUp, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  MessageSquare,
+  TrendingUp,
+  Settings,
   ShieldCheck,
   Zap,
   LogOut,
-  Building2
+  Building2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import type { SapCompany } from "@/lib/sap/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import type { SapCompany } from '@/lib/sap/types';
 
 type UserRole = 'admin' | 'supervisor' | 'cobrador';
 
@@ -35,10 +35,30 @@ type CompanyOption = {
 };
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Tablero Control', href: '/', roles: ['admin', 'supervisor', 'cobrador'] },
-  { icon: Users, label: 'Cartera de Deudores', href: '/debtors', roles: ['admin', 'supervisor', 'cobrador'] },
-  { icon: FileText, label: 'Libro de Facturas', href: '/invoices', roles: ['admin', 'supervisor', 'cobrador'] },
-  { icon: MessageSquare, label: 'Bandeja Unificada', href: '/interactions', roles: ['admin', 'supervisor', 'cobrador'] },
+  {
+    icon: LayoutDashboard,
+    label: 'Tablero Control',
+    href: '/',
+    roles: ['admin', 'supervisor', 'cobrador'],
+  },
+  {
+    icon: Users,
+    label: 'Cartera de Deudores',
+    href: '/debtors',
+    roles: ['admin', 'supervisor', 'cobrador'],
+  },
+  {
+    icon: FileText,
+    label: 'Libro de Facturas',
+    href: '/invoices',
+    roles: ['admin', 'supervisor', 'cobrador'],
+  },
+  {
+    icon: MessageSquare,
+    label: 'Bandeja Unificada',
+    href: '/interactions',
+    roles: ['admin', 'supervisor', 'cobrador'],
+  },
   { icon: TrendingUp, label: 'IA Analítica', href: '/analytics', roles: ['admin', 'supervisor'] },
   { icon: ShieldCheck, label: 'Logs de Auditoría', href: '/audit', roles: ['admin'] },
 ];
@@ -56,7 +76,7 @@ export function Sidebar() {
       // Cargar todas las empresas SAP activas
       const response = await fetch('/api/admin/sap-companies');
       const data = await response.json();
-      
+
       if (response.ok && data.companies) {
         const activeCompanies = data.companies
           .filter((c: SapCompany) => c.isActive)
@@ -116,7 +136,7 @@ export function Sidebar() {
     localStorage.setItem('activeCompanyId', id);
     const company = userCompanies.find((c: CompanyOption) => c.id === id);
     toast({
-      title: "Empresa Cambiada",
+      title: 'Empresa Cambiada',
       description: `Ahora operando en: ${company?.name || 'Empresa seleccionada'}`,
     });
     window.dispatchEvent(new Event('storage'));
@@ -126,13 +146,13 @@ export function Sidebar() {
     localStorage.removeItem('userRole');
     localStorage.removeItem('activeCompanyId');
     toast({
-      title: "Sesión cerrada",
-      description: "Has salido del sistema de forma segura.",
+      title: 'Sesión cerrada',
+      description: 'Has salido del sistema de forma segura.',
     });
-    router.push("/login");
+    router.push('/login');
   };
 
-  const filteredNavItems = navItems.filter(item => item.roles.includes(role));
+  const filteredNavItems = navItems.filter((item) => item.roles.includes(role));
 
   return (
     <div className="w-72 bg-primary text-white flex flex-col h-screen sticky top-0 shrink-0 shadow-2xl z-20 overflow-hidden">
@@ -145,13 +165,19 @@ export function Sidebar() {
           <div>
             <h1 className="text-xl font-headline font-bold leading-tight">Crediat</h1>
             <span className="text-[10px] uppercase tracking-widest font-black text-accent/80">
-              {role === 'admin' ? 'Administrador' : role === 'supervisor' ? 'Supervisor' : 'Cobrador'}
+              {role === 'admin'
+                ? 'Administrador'
+                : role === 'supervisor'
+                  ? 'Supervisor'
+                  : 'Cobrador'}
             </span>
           </div>
         </Link>
-        
+
         <div className="space-y-2">
-          <span className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Unidad de Negocio</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">
+            Unidad de Negocio
+          </span>
           <Select value={activeCompanyId} onValueChange={handleCompanyChange}>
             <SelectTrigger className="w-full bg-white/5 border-white/10 h-12 rounded-xl text-white font-bold focus:ring-accent group">
               <div className="flex items-center gap-2">
@@ -161,7 +187,11 @@ export function Sidebar() {
             </SelectTrigger>
             <SelectContent className="bg-primary border-white/10 text-white rounded-xl">
               {userCompanies.map((c) => (
-                <SelectItem key={c.id} value={c.id} className="font-bold focus:bg-white/10 focus:text-white cursor-pointer">
+                <SelectItem
+                  key={c.id}
+                  value={c.id}
+                  className="font-bold focus:bg-white/10 focus:text-white cursor-pointer"
+                >
                   {c.name}
                 </SelectItem>
               ))}
@@ -172,25 +202,28 @@ export function Sidebar() {
 
       <nav className="flex-1 px-4 space-y-1 py-8 overflow-y-auto">
         {filteredNavItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+          const isActive =
+            pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative",
-                isActive 
-                  ? "bg-white/10 text-white font-bold" 
-                  : "text-white/60 hover:bg-white/5 hover:text-white"
+                'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative',
+                isActive
+                  ? 'bg-white/10 text-white font-bold'
+                  : 'text-white/60 hover:bg-white/5 hover:text-white'
               )}
             >
               {isActive && (
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-accent rounded-r-full shadow-[0_0_10px_rgba(250,147,25,0.5)]" />
               )}
-              <item.icon className={cn(
-                "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
-                isActive ? "text-accent" : "text-white/40"
-              )} />
+              <item.icon
+                className={cn(
+                  'w-5 h-5 transition-transform duration-300 group-hover:scale-110',
+                  isActive ? 'text-accent' : 'text-white/40'
+                )}
+              />
               <span className="text-sm">{item.label}</span>
             </Link>
           );
@@ -199,27 +232,29 @@ export function Sidebar() {
 
       <div className="p-6 border-t border-white/5 bg-white/5 space-y-2">
         {role === 'admin' && (
-          <Link 
+          <Link
             href="/settings"
             className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative",
-              pathname === '/settings' 
-                ? "bg-white/10 text-white font-bold" 
-                : "text-white/60 hover:bg-white/5 hover:text-white"
+              'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative',
+              pathname === '/settings'
+                ? 'bg-white/10 text-white font-bold'
+                : 'text-white/60 hover:bg-white/5 hover:text-white'
             )}
           >
             {pathname === '/settings' && (
               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-accent rounded-r-full shadow-[0_0_10px_rgba(250,147,25,0.5)]" />
             )}
-            <Settings className={cn(
-              "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
-              pathname === '/settings' ? "text-accent" : "text-white/40"
-            )} />
+            <Settings
+              className={cn(
+                'w-5 h-5 transition-transform duration-300 group-hover:scale-110',
+                pathname === '/settings' ? 'text-accent' : 'text-white/40'
+              )}
+            />
             <span className="text-sm">Configuración Sistema</span>
           </Link>
         )}
-        
-        <button 
+
+        <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-white/40 hover:text-red-400 hover:bg-red-500/10"
         >

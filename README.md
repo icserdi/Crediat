@@ -7,43 +7,54 @@ Sistema de Gestión de Cobranza con IA para la recuperación de cartera de alto 
 ## Requerimientos de Seguridad y Acceso (v1.1)
 
 ### 1. Control de Dominios
+
 El acceso está restringido exclusivamente a colaboradores con correos de los siguientes dominios:
+
 - `serdi.com.mx`
 - `heliequiposindustriales.com`
 - `merkaaceros.com`
 
 ### 2. Autenticación Multifactor (MFA)
+
 - Inicio de sesión mediante código de validación enviado por correo electrónico (OTP).
 - Opción de recuperación de credenciales vía email.
 
 ### 3. Trazabilidad Inmutable
+
 Todas las acciones de autenticación se registran automáticamente en el Ledger de Auditoría:
+
 - Inicios de sesión exitosos y fallidos.
 - Cierres de sesión.
 - Solicitudes de recuperación de contraseña.
 
 ### 4. Integración ERP (SAP B1)
+
 El sistema requiere conexión con SAP Business One v9.2 for HANA. Consultar el archivo `sap-integration-spec.md` en la raíz para detalles técnicos de la API.
 
 **Notas de integración actualizadas (Jun 2026):**
+
 - Healthcheck usa `BusinessPartners?$top=0` (no `UsersService_GetCurrentUser` que no existe en v9.2)
 - Filtro de clientes: `CardType eq 'cCustomer'` (enum `BoCardTypes`)
 - Campos reales de respuesta: `EmailAddress`, `CreditLimit`, `CurrentAccountBalance` (no `E_Mail`, `CreditLine`, `Balance`)
 - Query string OData: usar `%20` para espacios (no `+`)
 
 ### 5. Comunicaciones Transaccionales (Brevo)
+
 - Envío de **email transaccional** (OTP, recuperación, notificaciones de cobranza).
 - Envío de **WhatsApp** para gestiones de cobranza (plantillas y tracking básico).
 - Proveedor sugerido: **Brevo**.
 
 ### 6. Automatización (Opcional)
+
 - Se puede usar **n8n (autohospedado)** para automatizar procesos como: sincronizaciones programadas, recordatorios, escalaciones, y flujos de notificación.
 
 ### 7. Unidades de Negocio (Multi‑empresa SAP)
+
 - El selector de empresa debe corresponder a las **empresas/CompanyDB (schemas) disponibles en SAP B1**.
 - Debe ser **configurable por un administrador**: elegir qué empresas se muestran, asignarlas a usuarios, y definir **nombres amigables**.
 
 ## Tecnología
+
 - **Frontend**: Next.js 15+, Tailwind CSS, Shadcn UI
 - **IA**: Vercel AI SDK + OpenRouter (multi-modelo) / Microsoft Foundry (Azure AI Foundry)
 - **Integración**: SAP Service Layer (REST API)
@@ -55,6 +66,7 @@ El sistema requiere conexión con SAP Business One v9.2 for HANA. Consultar el a
 La capa de IA usa [Vercel AI SDK](https://sdk.vercel.ai) y soporta dos proveedores configurables vía `AI_PROVIDER`:
 
 ### OpenRouter (default)
+
 Multi-modelo: acceso a cientos de modelos (Claude, GPT, Llama, DeepSeek, etc.) con una sola API key.
 
 ```bash
@@ -66,6 +78,7 @@ OPENROUTER_MODEL=openrouter/auto   # o un modelo específico, ej. openai/gpt-4o-
 Obtén tu key en https://openrouter.ai/settings/keys
 
 ### Microsoft Foundry (Azure AI Foundry)
+
 Usa modelos desplegados en tu proyecto de Azure AI Foundry.
 
 ```bash
@@ -79,10 +92,10 @@ AZURE_FOUNDRY_DEPLOYMENT=<nombre-del-deployment>
 
 Los flujos de IA se exponen como rutas API:
 
-| Endpoint | Descripción |
-|----------|-------------|
+| Endpoint                         | Descripción                                                  |
+| -------------------------------- | ------------------------------------------------------------ |
 | `POST /api/ai/predict-cash-flow` | Predice el flujo de caja futuro a partir de datos históricos |
-| `POST /api/ai/generate-message` | Genera un mensaje de cobranza personalizado por IA |
+| `POST /api/ai/generate-message`  | Genera un mensaje de cobranza personalizado por IA           |
 
 ## Despliegue Local con Docker
 

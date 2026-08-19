@@ -40,9 +40,7 @@ export async function GET(request: NextRequest) {
 
     let path = '/Invoices';
 
-    const odataFilter = filter
-      ? `(${filter})`
-      : "DocumentStatus eq 'bost_Open'";
+    const odataFilter = filter ? `(${filter})` : "DocumentStatus eq 'bost_Open'";
 
     const queryParts = [
       `$filter=${encodeURIComponent(odataFilter)}`,
@@ -73,8 +71,7 @@ export async function GET(request: NextRequest) {
       const status =
         error.code === 'SAP_CONFIG_MISSING'
           ? 503
-          : error.code === 'SAP_AUTH_FAILED' ||
-              error.code === 'SAP_SESSION_EXPIRED'
+          : error.code === 'SAP_AUTH_FAILED' || error.code === 'SAP_SESSION_EXPIRED'
             ? 401
             : error.retryable
               ? 502
@@ -94,8 +91,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',
-        message:
-          error instanceof Error ? error.message : 'Error inesperado al obtener facturas',
+        message: error instanceof Error ? error.message : 'Error inesperado al obtener facturas',
       },
       { status: 500 }
     );

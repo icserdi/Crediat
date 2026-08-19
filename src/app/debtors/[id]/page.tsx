@@ -1,20 +1,14 @@
 'use client';
 
-import { Sidebar } from "@/components/layout/sidebar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  HandCoins,
-  Zap,
-  CheckCircle2,
-  AlertCircle,
-  Calendar
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState, use, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useDebtorDetail } from "@/hooks/use-debtor-detail";
+import { Sidebar } from '@/components/layout/sidebar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { HandCoins, Zap, CheckCircle2, AlertCircle, Calendar } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useState, use, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { useDebtorDetail } from '@/hooks/use-debtor-detail';
 
 export default function DebtorDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -34,15 +28,15 @@ export default function DebtorDetailPage({ params }: { params: Promise<{ id: str
 
     if (result.ok) {
       toast({
-        title: result.sapWritten ? "Promesa registrada en SAP" : "Promesa registrada (local)",
+        title: result.sapWritten ? 'Promesa registrada en SAP' : 'Promesa registrada (local)',
         description: result.message,
       });
       setPromiseDate('');
     } else {
       toast({
-        title: "Error",
+        title: 'Error',
         description: result.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -60,9 +54,7 @@ export default function DebtorDetailPage({ params }: { params: Promise<{ id: str
               <div className="flex items-center gap-3">
                 <h2 className="text-4xl font-headline font-bold text-primary">Deudor: {id}</h2>
               </div>
-              <p className="text-muted-foreground text-lg font-medium">
-                ID: {id}
-              </p>
+              <p className="text-muted-foreground text-lg font-medium">ID: {id}</p>
             </div>
           </div>
         </div>
@@ -76,7 +68,9 @@ export default function DebtorDetailPage({ params }: { params: Promise<{ id: str
                   <div className="p-2 bg-primary rounded-lg shadow-md shadow-primary/20">
                     <HandCoins className="w-5 h-5 text-white" />
                   </div>
-                  <CardTitle className="text-xl font-headline text-primary">Registrar Promesa de Pago</CardTitle>
+                  <CardTitle className="text-xl font-headline text-primary">
+                    Registrar Promesa de Pago
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-8 space-y-6">
@@ -99,12 +93,15 @@ export default function DebtorDetailPage({ params }: { params: Promise<{ id: str
                   {isSaving ? (
                     <>Registrando...</>
                   ) : (
-                    <><HandCoins className="w-5 h-5" /> Registrar Promesa en SAP</>
+                    <>
+                      <HandCoins className="w-5 h-5" /> Registrar Promesa en SAP
+                    </>
                   )}
                 </Button>
                 <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-xs text-blue-800 font-medium">
                   <Zap className="w-4 h-4 inline mr-1 text-blue-600" />
-                  La promesa se registra en la BD local y, si los campos U_AI_* existen en SAP, también se escriben allí.
+                  La promesa se registra en la BD local y, si los campos U_AI_* existen en SAP,
+                  también se escriben allí.
                 </div>
               </CardContent>
             </Card>
@@ -116,7 +113,9 @@ export default function DebtorDetailPage({ params }: { params: Promise<{ id: str
                   <div className="p-2 bg-accent rounded-lg shadow-md">
                     <Calendar className="w-5 h-5 text-white" />
                   </div>
-                  <CardTitle className="text-xl font-headline text-primary">Historial de Gestiones</CardTitle>
+                  <CardTitle className="text-xl font-headline text-primary">
+                    Historial de Gestiones
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-8">
@@ -127,7 +126,10 @@ export default function DebtorDetailPage({ params }: { params: Promise<{ id: str
                 ) : (
                   <div className="space-y-4">
                     {interactions.map((item) => (
-                      <div key={item.id} className="flex gap-4 p-4 bg-muted/5 rounded-2xl border border-primary/5">
+                      <div
+                        key={item.id}
+                        className="flex gap-4 p-4 bg-muted/5 rounded-2xl border border-primary/5"
+                      >
                         <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
                           {item.type === 'WhatsApp' ? (
                             <Zap className="w-5 h-5 text-accent" />
@@ -137,7 +139,9 @@ export default function DebtorDetailPage({ params }: { params: Promise<{ id: str
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-start mb-1">
-                            <span className="font-bold text-primary text-sm">{item.assigned_to}</span>
+                            <span className="font-bold text-primary text-sm">
+                              {item.assigned_to}
+                            </span>
                             <span className="text-[10px] text-muted-foreground font-mono">
                               {new Date(item.created_at).toLocaleString()}
                             </span>
@@ -167,9 +171,7 @@ export default function DebtorDetailPage({ params }: { params: Promise<{ id: str
                 <div className="space-y-4">
                   <div className="p-4 bg-white/10 rounded-2xl border border-white/5 backdrop-blur-sm">
                     <CheckCircle2 className="w-5 h-5 text-green-400 mb-2" />
-                    <p className="text-sm text-white/80 font-medium">
-                      Registro de promesa de pago
-                    </p>
+                    <p className="text-sm text-white/80 font-medium">Registro de promesa de pago</p>
                   </div>
                   {!activeCompanyId && (
                     <div className="p-4 bg-red-500/20 rounded-2xl border border-red-500/30">

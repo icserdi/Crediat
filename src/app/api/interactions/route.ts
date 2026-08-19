@@ -55,7 +55,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ interactions: rows });
   } catch (error) {
     return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message: error instanceof Error ? error.message : 'Error al obtener interacciones' },
+      {
+        error: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Error al obtener interacciones',
+      },
       { status: 500 }
     );
   }
@@ -70,7 +73,10 @@ export async function POST(request: NextRequest) {
 
     if (!companyDb || !debtorId || !debtorName || !content) {
       return NextResponse.json(
-        { error: 'VALIDATION_ERROR', message: 'Faltan campos requeridos: companyDb, debtorId, debtorName, content' },
+        {
+          error: 'VALIDATION_ERROR',
+          message: 'Faltan campos requeridos: companyDb, debtorId, debtorName, content',
+        },
         { status: 400 }
       );
     }
@@ -82,8 +88,11 @@ export async function POST(request: NextRequest) {
     `;
 
     const rows = await query<InteractionRow>(sql, [
-      companyDb, debtorId, debtorName,
-      type || 'WhatsApp', content,
+      companyDb,
+      debtorId,
+      debtorName,
+      type || 'WhatsApp',
+      content,
       direction || 'outbound',
       assignedTo || 'Sistema IA',
       userId || null,
@@ -92,7 +101,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ interaction: rows[0] }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message: error instanceof Error ? error.message : 'Error al crear interacción' },
+      {
+        error: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Error al crear interacción',
+      },
       { status: 500 }
     );
   }

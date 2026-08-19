@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  SapServiceLayerError,
-  mapHttpStatusToSapError,
-  isSapServiceLayerError,
-} from './errors';
+import { SapServiceLayerError, mapHttpStatusToSapError, isSapServiceLayerError } from './errors';
 
 describe('SapServiceLayerError', () => {
   it('crea un error con código y detalles', () => {
@@ -82,4 +78,3 @@ describe('isSapServiceLayerError', () => {
     expect(isSapServiceLayerError(null)).toBe(false);
   });
 });
-

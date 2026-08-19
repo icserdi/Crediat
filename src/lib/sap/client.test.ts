@@ -70,7 +70,9 @@ describe('SapServiceLayerClient', () => {
     });
 
     it('lanza SAP_AUTH_FAILED si el login falla con 401', async () => {
-      fetchMock.mockResolvedValueOnce(jsonResponse({ error: { message: 'Invalid' } }, { status: 401 }));
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse({ error: { message: 'Invalid' } }, { status: 401 })
+      );
 
       const client = new SapServiceLayerClient(config);
       await expect(
@@ -201,9 +203,9 @@ describe('SapServiceLayerClient', () => {
         .mockRejectedValueOnce(new TypeError('fetch failed'));
 
       const client = new SapServiceLayerClient(config);
-      await expect(
-        client.request({ path: '/x', method: 'POST', body: {} })
-      ).rejects.toBeInstanceOf(SapServiceLayerError);
+      await expect(client.request({ path: '/x', method: 'POST', body: {} })).rejects.toBeInstanceOf(
+        SapServiceLayerError
+      );
       // login + 1 solo intento del POST
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });

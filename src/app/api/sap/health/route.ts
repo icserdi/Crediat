@@ -13,8 +13,7 @@ export async function GET(request: NextRequest) {
       {
         ok: false,
         code: 'SAP_CONFIG_MISSING',
-        message:
-          'SAP no configurado. Defina SAP_SERVICE_LAYER_* en variables de entorno.',
+        message: 'SAP no configurado. Defina SAP_SERVICE_LAYER_* en variables de entorno.',
       },
       { status: 503 }
     );
@@ -42,8 +41,7 @@ export async function GET(request: NextRequest) {
       const status =
         error.code === 'SAP_CONFIG_MISSING'
           ? 503
-          : error.code === 'SAP_AUTH_FAILED' ||
-              error.code === 'SAP_SESSION_EXPIRED'
+          : error.code === 'SAP_AUTH_FAILED' || error.code === 'SAP_SESSION_EXPIRED'
             ? 401
             : error.retryable
               ? 502
@@ -65,8 +63,7 @@ export async function GET(request: NextRequest) {
       {
         ok: false,
         code: 'SAP_UNKNOWN',
-        message:
-          error instanceof Error ? error.message : 'Error inesperado en healthcheck SAP',
+        message: error instanceof Error ? error.message : 'Error inesperado en healthcheck SAP',
       },
       { status: 500 }
     );

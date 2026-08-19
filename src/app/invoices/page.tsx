@@ -1,39 +1,39 @@
 'use client';
 
-import { Sidebar } from "@/components/layout/sidebar";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  Filter, 
-  AlertCircle, 
-  Clock, 
+import { Sidebar } from '@/components/layout/sidebar';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Search,
+  Filter,
+  AlertCircle,
+  Clock,
   CheckCircle2,
   RefreshCw,
   MoreHorizontal,
   Mail,
   TrendingUp,
-  Building2
-} from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { useInvoices } from "@/hooks/use-invoices";
-import { useActiveCompany } from "@/hooks/use-active-company";
+  Building2,
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { useInvoices } from '@/hooks/use-invoices';
+import { useActiveCompany } from '@/hooks/use-active-company';
 
 export default function InvoicesPage() {
   const { activeCompanyId } = useActiveCompany();
@@ -41,21 +41,22 @@ export default function InvoicesPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const overdueTotal = invoices
-    .filter(i => i.status === 'Vencida')
+    .filter((i) => i.status === 'Vencida')
     .reduce((sum, i) => sum + i.total, 0);
 
   const pendingTotal = invoices
-    .filter(i => i.status === 'Pendiente')
+    .filter((i) => i.status === 'Pendiente')
     .reduce((sum, i) => sum + i.total, 0);
 
   const paidTotal = invoices
-    .filter(i => i.status === 'Pagada')
+    .filter((i) => i.status === 'Pagada')
     .reduce((sum, i) => sum + i.total, 0);
 
-  const filteredInvoices = invoices.filter(inv =>
-    inv.cardName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    inv.docNum.toString().includes(searchQuery) ||
-    inv.cardCode.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredInvoices = invoices.filter(
+    (inv) =>
+      inv.cardName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      inv.docNum.toString().includes(searchQuery) ||
+      inv.cardCode.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -71,18 +72,11 @@ export default function InvoicesPage() {
             </div>
           </div>
           <div className="flex gap-3">
-            <Button
-              onClick={reload}
-              disabled={isLoading}
-              variant="outline"
-              className="gap-2"
-            >
-              <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
-              {isLoading ? "Cargando..." : "Recargar"}
+            <Button onClick={reload} disabled={isLoading} variant="outline" className="gap-2">
+              <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
+              {isLoading ? 'Cargando...' : 'Recargar'}
             </Button>
-            <Button className="bg-accent hover:bg-accent/90">
-              Acción de Cobro Masivo
-            </Button>
+            <Button className="bg-accent hover:bg-accent/90">Acción de Cobro Masivo</Button>
           </div>
         </div>
 
@@ -92,7 +86,9 @@ export default function InvoicesPage() {
               <AlertCircle className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Vencido</p>
+              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                Vencido
+              </p>
               <h3 className="text-2xl font-headline font-bold text-primary">
                 ${overdueTotal.toLocaleString()}
               </h3>
@@ -103,7 +99,9 @@ export default function InvoicesPage() {
               <Clock className="w-6 h-6 text-orange-600" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Pendiente</p>
+              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                Pendiente
+              </p>
               <h3 className="text-2xl font-headline font-bold text-primary">
                 ${pendingTotal.toLocaleString()}
               </h3>
@@ -114,7 +112,9 @@ export default function InvoicesPage() {
               <CheckCircle2 className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Pagado</p>
+              <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                Pagado
+              </p>
               <h3 className="text-2xl font-headline font-bold text-primary">
                 ${paidTotal.toLocaleString()}
               </h3>
@@ -173,54 +173,72 @@ export default function InvoicesPage() {
               <TableBody>
                 {filteredInvoices.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="py-20 text-center text-muted-foreground italic">
-                      {searchQuery ? 'No se encontraron facturas que coincidan con la búsqueda.' : 'No hay facturas para esta empresa.'}
+                    <TableCell
+                      colSpan={7}
+                      className="py-20 text-center text-muted-foreground italic"
+                    >
+                      {searchQuery
+                        ? 'No se encontraron facturas que coincidan con la búsqueda.'
+                        : 'No hay facturas para esta empresa.'}
                     </TableCell>
                   </TableRow>
-                ) : filteredInvoices.map((inv) => (
-                  <TableRow key={inv.docEntry} className="group">
-                    <TableCell className="font-mono font-medium text-primary">
-                      {inv.docNum}
-                    </TableCell>
-                    <TableCell className="font-semibold">{inv.cardName}</TableCell>
-                    <TableCell className="font-mono font-bold">
-                      ${inv.total.toLocaleString()} <span className="text-[10px] text-muted-foreground">{inv.currency}</span>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{inv.dueDate}</TableCell>
-                    <TableCell>
-                      {inv.daysOverdue > 0 ? (
-                        <span className="text-red-600 font-semibold">{inv.daysOverdue} d</span>
-                      ) : (
-                        <span className="text-green-600">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={
-                        inv.status === 'Vencida' ? 'destructive' :
-                        inv.status === 'Pagada' ? 'secondary' : 'outline'
-                      } className={inv.status === 'Pagada' ? 'bg-green-100 text-green-700 hover:bg-green-100' : ''}>
-                        {inv.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="gap-2">
-                            <Mail className="w-4 h-4" /> Reenviar Factura
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
-                            <TrendingUp className="w-4 h-4" /> Forzar Cobranza IA
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                ) : (
+                  filteredInvoices.map((inv) => (
+                    <TableRow key={inv.docEntry} className="group">
+                      <TableCell className="font-mono font-medium text-primary">
+                        {inv.docNum}
+                      </TableCell>
+                      <TableCell className="font-semibold">{inv.cardName}</TableCell>
+                      <TableCell className="font-mono font-bold">
+                        ${inv.total.toLocaleString()}{' '}
+                        <span className="text-[10px] text-muted-foreground">{inv.currency}</span>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{inv.dueDate}</TableCell>
+                      <TableCell>
+                        {inv.daysOverdue > 0 ? (
+                          <span className="text-red-600 font-semibold">{inv.daysOverdue} d</span>
+                        ) : (
+                          <span className="text-green-600">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            inv.status === 'Vencida'
+                              ? 'destructive'
+                              : inv.status === 'Pagada'
+                                ? 'secondary'
+                                : 'outline'
+                          }
+                          className={
+                            inv.status === 'Pagada'
+                              ? 'bg-green-100 text-green-700 hover:bg-green-100'
+                              : ''
+                          }
+                        >
+                          {inv.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem className="gap-2">
+                              <Mail className="w-4 h-4" /> Reenviar Factura
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2">
+                              <TrendingUp className="w-4 h-4" /> Forzar Cobranza IA
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           )}

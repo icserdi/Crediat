@@ -7,6 +7,8 @@
     "build": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "eslint . --ext .js,.mjs,.cjs,.jsx,.ts,.mts,.cts,.tsx",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -24,7 +26,8 @@
     "release:patch": "standard-version --release-as patch"
   },
   "lint-staged": {
-    "**/*.{js,mjs,cjs,jsx,ts,tsx}": [
+    "**/*.{js,mjs,cjs,jsx,ts,tsx,json,md}": [
+      "prettier --write",
       "eslint --fix"
     ]
   },
@@ -86,6 +89,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
     "postcss": "^8",
+    "prettier": "^3.9.6",
     "standard-version": "^9.5.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5",

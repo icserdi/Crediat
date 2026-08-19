@@ -5,9 +5,11 @@ Esta especificación detalla los requerimientos de datos para la API intermedia 
 **Actualizado Jun 2026** — Campos corregidos según respuesta real de Service Layer v9.2.
 
 ## 1. Endpoint: Sincronización de Deudores (Business Partners)
+
 **Propósito:** Obtener la información maestra de clientes para el análisis de riesgo.
 
 ### Datos Requeridos de SAP (GET):
+
 - `CardCode`: Identificador único del cliente.
 - `CardName`: Nombre o Razón Social.
 - `EmailAddress`: Correo electrónico de cobranza/facturación (no `E_Mail`).
@@ -17,6 +19,7 @@ Esta especificación detalla los requerimientos de datos para la API intermedia 
 - `GroupCode`: Para segmentación por tipo de cliente.
 
 ### Detalles técnicos:
+
 - **Healthcheck**: `GET /BusinessPartners?$top=0` (no `UsersService_GetCurrentUser` — no existe en v9.2)
 - **Filtro clientes**: `CardType eq 'cCustomer'` (enum `BoCardTypes`: cCustomer, cSupplier, cLid)
 - **Query string**: usar `encodeURIComponent()` → `%20` para espacios (no `+` de URLSearchParams)
@@ -24,9 +27,11 @@ Esta especificación detalla los requerimientos de datos para la API intermedia 
 ---
 
 ## 2. Endpoint: Sincronización de Facturas (Invoices)
+
 **Propósito:** Alimentar el Ledger de Facturación y la antigüedad de saldos.
 
 ### Datos Requeridos de SAP (GET):
+
 - `DocEntry` / `DocNum`: Identificadores de la factura.
 - `CardCode` / `CardName`: Relación con el deudor.
 - `DocDate`: Fecha de emisión.
@@ -36,15 +41,18 @@ Esta especificación detalla los requerimientos de datos para la API intermedia 
 - `DocumentStatus`: Estado (`bost_Open`, `bost_Close`, `bost_Delivered`).
 
 ### Notas:
+
 - No existe el campo `PaidToDate` en el endpoint `Invoices` de Service Layer v9.2. El saldo pendiente se calcula contrastando con `IncomingPayments`.
 - El filtro por defecto es `DocumentStatus eq 'bost_Open'` (facturas abiertas/pendientes).
 
 ---
 
 ## 3. Endpoint: Registro de Promesas/Pagos (POST/PATCH)
+
 **Propósito:** Notificar a SAP sobre gestiones realizadas o reportar pagos identificados.
 
 ### Datos a enviar desde la app:
+
 - `U_Cred_LastContact`: Fecha de última gestión de crédito.
 - `U_Cred_RiskScore`: Score de riesgo calculado por la IA.
 - `U_Cred_PaymentPromise`: Fecha de promesa de pago acordada.
@@ -52,6 +60,7 @@ Esta especificación detalla los requerimientos de datos para la API intermedia 
 ---
 
 ## Requerimientos de Conectividad
+
 - **Protocolo:** HTTPS / REST.
 - **Autenticación:** API Key o JWT (Service Layer Token).
 - **Formato:** JSON (UTF-8).

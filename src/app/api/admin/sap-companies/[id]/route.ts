@@ -13,10 +13,7 @@ const updateCompanySchema = z.object({
  * GET /api/admin/sap-companies/[id]
  * Obtiene una empresa SAP por ID.
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const store = getSapCompaniesStore();
     const { id } = await params;
@@ -34,8 +31,7 @@ export async function GET(
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',
-        message:
-          error instanceof Error ? error.message : 'Error al obtener empresa',
+        message: error instanceof Error ? error.message : 'Error al obtener empresa',
       },
       { status: 500 }
     );
@@ -46,10 +42,7 @@ export async function GET(
  * PATCH /api/admin/sap-companies/[id]
  * Actualiza una empresa SAP existente.
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const body = await request.json();
     const parsed = updateCompanySchema.safeParse(body);
@@ -77,20 +70,13 @@ export async function PATCH(
 
     return NextResponse.json({ company });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Error al actualizar empresa';
+    const message = error instanceof Error ? error.message : 'Error al actualizar empresa';
 
     if (message.includes('Ya existe una empresa')) {
-      return NextResponse.json(
-        { error: 'DUPLICATE_COMPANYDB', message },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'DUPLICATE_COMPANYDB', message }, { status: 409 });
     }
 
-    return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'INTERNAL_ERROR', message }, { status: 500 });
   }
 }
 
@@ -119,8 +105,7 @@ export async function DELETE(
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',
-        message:
-          error instanceof Error ? error.message : 'Error al eliminar empresa',
+        message: error instanceof Error ? error.message : 'Error al eliminar empresa',
       },
       { status: 500 }
     );

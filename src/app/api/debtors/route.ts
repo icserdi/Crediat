@@ -38,24 +38,24 @@ export async function GET(request: NextRequest) {
 
   try {
     const client = getSapClient();
-    
+
     // Construir la query OData manualmente para usar %20 en lugar de + para espacios
     let path = '/BusinessPartners';
-    
+
     // Filtrar solo clientes (CardType = 'cCustomer')
-    const odataFilter = filter 
+    const odataFilter = filter
       ? `(${filter}) and CardType eq 'cCustomer'`
       : "CardType eq 'cCustomer'";
-    
+
     const queryParts = [
       `$filter=${encodeURIComponent(odataFilter)}`,
       `$select=${encodeURIComponent('CardCode,CardName,EmailAddress,Phone1,Cellular,CreditLimit,CurrentAccountBalance,GroupCode')}`,
       `$orderby=${encodeURIComponent('CardName asc')}`,
     ];
-    
+
     if (skip > 0) queryParts.push(`$skip=${skip}`);
     if (top > 0) queryParts.push(`$top=${Math.min(top, 100)}`);
-    
+
     path += `?${queryParts.join('&')}`;
 
     const response = await client.request<SapODataListResponse<SapBusinessPartnerDto>>({
@@ -76,8 +76,7 @@ export async function GET(request: NextRequest) {
       const status =
         error.code === 'SAP_CONFIG_MISSING'
           ? 503
-          : error.code === 'SAP_AUTH_FAILED' ||
-              error.code === 'SAP_SESSION_EXPIRED'
+          : error.code === 'SAP_AUTH_FAILED' || error.code === 'SAP_SESSION_EXPIRED'
             ? 401
             : error.retryable
               ? 502
@@ -97,8 +96,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',
-        message:
-          error instanceof Error ? error.message : 'Error inesperado al obtener deudores',
+        message: error instanceof Error ? error.message : 'Error inesperado al obtener deudores',
       },
       { status: 500 }
     );

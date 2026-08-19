@@ -5,16 +5,26 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as PredictCashFlowInput;
 
-    if (!body.historicalData || !Array.isArray(body.historicalData) || body.historicalData.length === 0) {
+    if (
+      !body.historicalData ||
+      !Array.isArray(body.historicalData) ||
+      body.historicalData.length === 0
+    ) {
       return NextResponse.json(
-        { error: 'VALIDATION_ERROR', message: 'historicalData es requerido y debe ser un array no vacío.' },
+        {
+          error: 'VALIDATION_ERROR',
+          message: 'historicalData es requerido y debe ser un array no vacío.',
+        },
         { status: 400 }
       );
     }
 
     if (!body.predictionHorizonDays || body.predictionHorizonDays <= 0) {
       return NextResponse.json(
-        { error: 'VALIDATION_ERROR', message: 'predictionHorizonDays es requerido y debe ser positivo.' },
+        {
+          error: 'VALIDATION_ERROR',
+          message: 'predictionHorizonDays es requerido y debe ser positivo.',
+        },
         { status: 400 }
       );
     }
@@ -23,7 +33,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
-      { error: 'AI_ERROR', message: error instanceof Error ? error.message : 'Error al generar predicción' },
+      {
+        error: 'AI_ERROR',
+        message: error instanceof Error ? error.message : 'Error al generar predicción',
+      },
       { status: 500 }
     );
   }

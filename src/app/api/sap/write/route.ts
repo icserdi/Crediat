@@ -33,7 +33,10 @@ export async function POST(request: NextRequest) {
 
     if (!companyId || !cardCode || !type || !data) {
       return NextResponse.json(
-        { error: 'VALIDATION_ERROR', message: 'Faltan campos requeridos: companyId, cardCode, type, data' },
+        {
+          error: 'VALIDATION_ERROR',
+          message: 'Faltan campos requeridos: companyId, cardCode, type, data',
+        },
         { status: 400 }
       );
     }
@@ -80,7 +83,11 @@ export async function POST(request: NextRequest) {
       const msg = err instanceof Error ? err.message : String(err);
       // Si el error es por UDF inexistente, no es bloqueante
       if (msg.includes('U_Cred_') || msg.includes('Invalid query')) {
-        sapResult = { ok: false, udfError: 'Los campos U_Cred_* no existen en SAP. Deben crearse en SAP Business One antes de escribir.' };
+        sapResult = {
+          ok: false,
+          udfError:
+            'Los campos U_Cred_* no existen en SAP. Deben crearse en SAP Business One antes de escribir.',
+        };
       } else {
         throw err;
       }
@@ -151,7 +158,10 @@ export async function POST(request: NextRequest) {
       );
     }
     return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message: error instanceof Error ? error.message : 'Error inesperado' },
+      {
+        error: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Error inesperado',
+      },
       { status: 500 }
     );
   }

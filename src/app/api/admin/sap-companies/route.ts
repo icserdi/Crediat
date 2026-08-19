@@ -22,8 +22,7 @@ export async function GET() {
     return NextResponse.json(
       {
         error: 'INTERNAL_ERROR',
-        message:
-          error instanceof Error ? error.message : 'Error al listar empresas',
+        message: error instanceof Error ? error.message : 'Error al listar empresas',
       },
       { status: 500 }
     );
@@ -55,19 +54,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ company }, { status: 201 });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Error al crear empresa';
+    const message = error instanceof Error ? error.message : 'Error al crear empresa';
 
     if (message.includes('Ya existe una empresa')) {
-      return NextResponse.json(
-        { error: 'DUPLICATE_COMPANYDB', message },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'DUPLICATE_COMPANYDB', message }, { status: 409 });
     }
 
-    return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'INTERNAL_ERROR', message }, { status: 500 });
   }
 }

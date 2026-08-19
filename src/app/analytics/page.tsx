@@ -1,31 +1,31 @@
 'use client';
 
-import { Sidebar } from "@/components/layout/sidebar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
+import { Sidebar } from '@/components/layout/sidebar';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
   AreaChart,
   Area,
   BarChart,
-  Bar
-} from "recharts";
-import { 
-  TrendingUp, 
-  BrainCircuit, 
+  Bar,
+} from 'recharts';
+import {
+  TrendingUp,
+  BrainCircuit,
   ArrowUpRight,
   Zap,
   RefreshCw,
   AlertCircle,
-  Building2
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { useAnalytics } from "@/hooks/use-analytics";
-import { useActiveCompany } from "@/hooks/use-active-company";
+  Building2,
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { useAnalytics } from '@/hooks/use-analytics';
+import { useActiveCompany } from '@/hooks/use-active-company';
 
 export default function AnalyticsPage() {
   const { activeCompanyId } = useActiveCompany();
@@ -65,14 +65,21 @@ export default function AnalyticsPage() {
       <main className="flex-1 p-4 md:p-8 overflow-y-auto">
         <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
-            <h2 className="text-4xl font-headline font-bold text-primary">Analítica e Inteligencia</h2>
+            <h2 className="text-4xl font-headline font-bold text-primary">
+              Analítica e Inteligencia
+            </h2>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Building2 className="w-4 h-4" />
-              <p className="text-lg">Perspectivas profundas de ciclos de cobro basadas en datos SAP.</p>
+              <p className="text-lg">
+                Perspectivas profundas de ciclos de cobro basadas en datos SAP.
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="bg-white px-3 py-1.5 gap-2 text-xs font-semibold border-primary/20">
+            <Badge
+              variant="outline"
+              className="bg-white px-3 py-1.5 gap-2 text-xs font-semibold border-primary/20"
+            >
               <Zap className="w-3.5 h-3.5 text-accent" />
               Datos al {data?.asOf ? new Date(data.asOf).toLocaleDateString() : '-'}
             </Badge>
@@ -82,7 +89,9 @@ export default function AnalyticsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-2">
-              <CardDescription className="text-xs uppercase font-bold">Tasa Morosidad</CardDescription>
+              <CardDescription className="text-xs uppercase font-bold">
+                Tasa Morosidad
+              </CardDescription>
               <CardTitle className="text-2xl font-headline flex items-baseline gap-2">
                 {data?.kpi.morosidad.toFixed(1)}%
                 <span className="text-xs text-muted-foreground">
@@ -93,7 +102,9 @@ export default function AnalyticsPage() {
           </Card>
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-2">
-              <CardDescription className="text-xs uppercase font-bold">Eficiencia Recuperación</CardDescription>
+              <CardDescription className="text-xs uppercase font-bold">
+                Eficiencia Recuperación
+              </CardDescription>
               <CardTitle className="text-2xl font-headline flex items-baseline gap-2">
                 {data?.kpi.recuperacion.toFixed(1)}%
                 <span className="text-xs text-green-600 flex items-center">
@@ -104,7 +115,9 @@ export default function AnalyticsPage() {
           </Card>
           <Card className="border-none shadow-sm">
             <CardHeader className="pb-2">
-              <CardDescription className="text-xs uppercase font-bold">Rotación Cartera</CardDescription>
+              <CardDescription className="text-xs uppercase font-bold">
+                Rotación Cartera
+              </CardDescription>
               <CardTitle className="text-2xl font-headline flex items-baseline gap-2">
                 {data?.kpi.rotacion.toFixed(1)}x
                 <span className="text-xs text-muted-foreground">Anual</span>
@@ -124,7 +137,9 @@ export default function AnalyticsPage() {
                   </CardTitle>
                   <CardDescription>Estimación basada en datos de SAP.</CardDescription>
                 </div>
-                <Badge variant="outline" className="border-accent text-accent">Confianza: 89%</Badge>
+                <Badge variant="outline" className="border-accent text-accent">
+                  Confianza: 89%
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="h-[350px]">
@@ -132,20 +147,45 @@ export default function AnalyticsPage() {
                 <AreaChart data={data?.cashFlowProjection || []}>
                   <defs>
                     <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#353585" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#353585" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#353585" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="#353585" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorProj" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#FA9319" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#FA9319" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#FA9319" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="#FA9319" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
                   <XAxis dataKey="day" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `$${val/1000}k`} />
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                  <Area type="monotone" dataKey="actual" stroke="#353585" fillOpacity={1} fill="url(#colorActual)" strokeWidth={3} />
-                  <Area type="monotone" dataKey="projected" stroke="#FA9319" fillOpacity={1} fill="url(#colorProj)" strokeDasharray="5 5" strokeWidth={2} />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(val) => `$${val / 1000}k`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="actual"
+                    stroke="#353585"
+                    fillOpacity={1}
+                    fill="url(#colorActual)"
+                    strokeWidth={3}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="projected"
+                    stroke="#FA9319"
+                    fillOpacity={1}
+                    fill="url(#colorProj)"
+                    strokeDasharray="5 5"
+                    strokeWidth={2}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -157,16 +197,24 @@ export default function AnalyticsPage() {
                 <BrainCircuit className="w-5 h-5 text-primary" />
                 Insights Estratégicos
               </CardTitle>
-              <CardDescription>Basados en datos SAP al {data?.asOf ? new Date(data.asOf).toLocaleDateString() : '-'}.</CardDescription>
+              <CardDescription>
+                Basados en datos SAP al{' '}
+                {data?.asOf ? new Date(data.asOf).toLocaleDateString() : '-'}.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {data?.insights.map((insight, i) => (
-                <div key={i} className={cn(
-                  "p-4 rounded-lg border",
-                  insight.type === 'warning' ? 'bg-orange-50 border-orange-100' :
-                  insight.type === 'success' ? 'bg-green-50 border-green-100' :
-                  'bg-primary/5 border-primary/10'
-                )}>
+                <div
+                  key={i}
+                  className={cn(
+                    'p-4 rounded-lg border',
+                    insight.type === 'warning'
+                      ? 'bg-orange-50 border-orange-100'
+                      : insight.type === 'success'
+                        ? 'bg-green-50 border-green-100'
+                        : 'bg-primary/5 border-primary/10'
+                  )}
+                >
                   <h5 className="font-semibold text-primary mb-1 flex items-center gap-2 text-sm">
                     {insight.title}
                   </h5>

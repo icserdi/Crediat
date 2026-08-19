@@ -31,22 +31,34 @@ export type GenerateCollectionMessageOutput = z.infer<typeof GenerateCollectionM
 void GenerateCollectionMessageOutputSchema;
 
 const getDebtorHistory = tool({
-  description: 'Recupera fragmentos históricos de conversaciones y resultados para un deudor específico.',
+  description:
+    'Recupera fragmentos históricos de conversaciones y resultados para un deudor específico.',
   inputSchema: z.object({
     debtorId: z.string().describe('ID único del deudor.'),
   }),
   execute: async ({ debtorId }) => {
     if (debtorId === 'debtor-123') {
       return [
-        { conversationSnippet: 'El deudor solicitó extensión de 7 días por flujo. Prometió pagar el 2023-10-15.', outcome: 'promesa', date: '2023-10-01' },
-        { conversationSnippet: 'Recordatorio enviado. Pagó en 2 días.', outcome: 'pagado', date: '2023-09-20' },
+        {
+          conversationSnippet:
+            'El deudor solicitó extensión de 7 días por flujo. Prometió pagar el 2023-10-15.',
+          outcome: 'promesa',
+          date: '2023-10-01',
+        },
+        {
+          conversationSnippet: 'Recordatorio enviado. Pagó en 2 días.',
+          outcome: 'pagado',
+          date: '2023-09-20',
+        },
       ];
     }
     return [];
   },
 });
 
-export async function generateCollectionMessage(input: GenerateCollectionMessageInput): Promise<GenerateCollectionMessageOutput> {
+export async function generateCollectionMessage(
+  input: GenerateCollectionMessageInput
+): Promise<GenerateCollectionMessageOutput> {
   const result = await generateText({
     model,
     tools: { getDebtorHistory },

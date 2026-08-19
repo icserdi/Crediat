@@ -1,6 +1,6 @@
-import type {Metadata} from 'next';
+import type { Metadata } from 'next';
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from '@/components/ui/toaster';
 import { Inter, Space_Grotesk } from 'next/font/google';
 
 const inter = Inter({
@@ -16,7 +16,8 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: 'Crediat | Gestión Inteligente de Crédito y Cobranza',
-  description: 'Sistema automatizado de gestión de cobranza con estrategia de IA integrada y analítica predictiva.',
+  description:
+    'Sistema automatizado de gestión de cobranza con estrategia de IA integrada y analítica predictiva.',
 };
 
 export default function RootLayout({

@@ -1,28 +1,28 @@
 'use client';
 
-import { Sidebar } from "@/components/layout/sidebar";
-import { Badge } from "@/components/ui/badge";
-import { 
-  MessageSquare, 
-  Phone, 
-  Mail, 
-  Search, 
+import { Sidebar } from '@/components/layout/sidebar';
+import { Badge } from '@/components/ui/badge';
+import {
+  MessageSquare,
+  Phone,
+  Mail,
+  Search,
   Send,
   User,
   Zap,
   BrainCircuit,
   RefreshCw,
   AlertCircle,
-  Building2
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
-import { useInteractions } from "@/hooks/use-interactions";
-import { useActiveCompany } from "@/hooks/use-active-company";
+  Building2,
+} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import { useInteractions } from '@/hooks/use-interactions';
+import { useActiveCompany } from '@/hooks/use-active-company';
 
 const companyIcons: Record<string, typeof MessageSquare> = {
   WhatsApp: MessageSquare,
@@ -33,7 +33,8 @@ const companyIcons: Record<string, typeof MessageSquare> = {
 export default function InteractionsPage() {
   const { toast } = useToast();
   const { activeCompanyId } = useActiveCompany();
-  const { interactions, isLoading, error, isSending, reload, send } = useInteractions(activeCompanyId);
+  const { interactions, isLoading, error, isSending, reload, send } =
+    useInteractions(activeCompanyId);
   const [searchQuery, setSearchQuery] = useState('');
   const [newMessage, setNewMessage] = useState('');
 
@@ -42,21 +43,22 @@ export default function InteractionsPage() {
     if (ok) {
       setNewMessage('');
       toast({
-        title: "Mensaje enviado",
-        description: "La interacción ha sido registrada en el sistema.",
+        title: 'Mensaje enviado',
+        description: 'La interacción ha sido registrada en el sistema.',
       });
     } else {
       toast({
-        title: "Error al enviar",
-        description: "No se pudo registrar la interacción.",
-        variant: "destructive",
+        title: 'Error al enviar',
+        description: 'No se pudo registrar la interacción.',
+        variant: 'destructive',
       });
     }
   };
 
-  const filteredInteractions = interactions.filter(i =>
-    i.debtor_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    i.content.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredInteractions = interactions.filter(
+    (i) =>
+      i.debtor_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      i.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const selectedInteraction = filteredInteractions[0];
@@ -80,8 +82,8 @@ export default function InteractionsPage() {
               variant="outline"
               className="gap-2 rounded-xl font-bold border-primary/10"
             >
-              <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
-              {isLoading ? "Cargando..." : "Recargar"}
+              <RefreshCw className={cn('w-4 h-4', isLoading && 'animate-spin')} />
+              {isLoading ? 'Cargando...' : 'Recargar'}
             </Button>
           </div>
           <div className="relative">
@@ -112,7 +114,9 @@ export default function InteractionsPage() {
                 </div>
               ) : filteredInteractions.length === 0 ? (
                 <div className="p-20 text-center text-muted-foreground italic font-medium">
-                  {searchQuery ? 'No se encontraron resultados.' : 'No hay interacciones registradas. Envíe un mensaje para comenzar.'}
+                  {searchQuery
+                    ? 'No se encontraron resultados.'
+                    : 'No hay interacciones registradas. Envíe un mensaje para comenzar.'}
                 </div>
               ) : (
                 <div className="divide-y divide-primary/5">
@@ -124,17 +128,25 @@ export default function InteractionsPage() {
                         className="p-5 hover:bg-muted/30 cursor-pointer transition-all border-l-4 border-transparent"
                       >
                         <div className="flex justify-between items-start mb-2">
-                          <span className="font-bold text-primary text-base">{msg.debtor_name}</span>
+                          <span className="font-bold text-primary text-base">
+                            {msg.debtor_name}
+                          </span>
                           <span className="text-[10px] text-muted-foreground font-mono">
                             {new Date(msg.created_at).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mb-3">
-                          <Badge variant="outline" className="text-[10px] px-2 h-5 gap-1.5 font-bold border-primary/10">
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-2 h-5 gap-1.5 font-bold border-primary/10"
+                          >
                             <Icon className="w-3 h-3 text-green-500" />
                             {msg.type}
                           </Badge>
-                          <Badge variant="secondary" className="text-[9px] px-2 h-5 bg-muted/50 font-black tracking-tighter text-primary/60">
+                          <Badge
+                            variant="secondary"
+                            className="text-[9px] px-2 h-5 bg-muted/50 font-black tracking-tighter text-primary/60"
+                          >
                             {msg.assigned_to === 'Sistema IA' ? (
                               <Zap className="w-2.5 h-2.5 mr-1 text-accent" />
                             ) : (
@@ -163,7 +175,9 @@ export default function InteractionsPage() {
                     {selectedInteraction.debtor_name[0]}
                   </div>
                   <div>
-                    <h4 className="font-headline font-bold text-primary text-lg">{selectedInteraction.debtor_name}</h4>
+                    <h4 className="font-headline font-bold text-primary text-lg">
+                      {selectedInteraction.debtor_name}
+                    </h4>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-green-500" />
                       <p className="text-xs text-green-600 font-bold uppercase tracking-widest text-[10px]">
@@ -192,9 +206,13 @@ export default function InteractionsPage() {
                       <BrainCircuit className="w-5 h-5 text-white" />
                     </div>
                     <div className="p-5 rounded-3xl max-w-[85%] shadow-sm border bg-primary text-white rounded-tr-none border-primary/5">
-                      <p className="text-sm font-medium leading-relaxed">{selectedInteraction.content}</p>
+                      <p className="text-sm font-medium leading-relaxed">
+                        {selectedInteraction.content}
+                      </p>
                       <div className="text-[9px] mt-2 font-bold uppercase tracking-widest text-white/40 text-right">
-                        {selectedInteraction.assigned_to === 'Sistema IA' ? "Generado por IA • " : ""}
+                        {selectedInteraction.assigned_to === 'Sistema IA'
+                          ? 'Generado por IA • '
+                          : ''}
                         {new Date(selectedInteraction.created_at).toLocaleString()}
                       </div>
                     </div>
@@ -212,11 +230,18 @@ export default function InteractionsPage() {
                     className="h-14 rounded-2xl bg-muted/20 border-primary/5 pr-12 focus:ring-accent font-medium"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSend();
+                    }}
                     disabled={isSending}
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                    <Badge variant="outline" className="text-[10px] font-black bg-white/50 text-accent border-accent/20">AI</Badge>
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] font-black bg-white/50 text-accent border-accent/20"
+                    >
+                      AI
+                    </Badge>
                   </div>
                 </div>
                 <Button

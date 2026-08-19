@@ -23,7 +23,10 @@ export async function POST(request: NextRequest) {
     const { email } = await request.json();
 
     if (!email) {
-      return NextResponse.json({ error: 'VALIDATION_ERROR', message: 'Email requerido' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'VALIDATION_ERROR', message: 'Email requerido' },
+        { status: 400 }
+      );
     }
 
     if (!validateDomain(email)) {
@@ -34,7 +37,10 @@ export async function POST(request: NextRequest) {
         description: `Intento de acceso desde dominio no autorizado: ${email}`,
         metadata: { email, reason: 'dominio_no_autorizado' },
       });
-      return NextResponse.json({ error: 'DOMAIN_NOT_ALLOWED', message: 'Dominio no autorizado' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'DOMAIN_NOT_ALLOWED', message: 'Dominio no autorizado' },
+        { status: 403 }
+      );
     }
 
     const otp = generateOtp(email);
@@ -56,7 +62,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message: error instanceof Error ? error.message : 'Error al enviar OTP' },
+      {
+        error: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Error al enviar OTP',
+      },
       { status: 500 }
     );
   }

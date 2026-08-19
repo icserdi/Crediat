@@ -43,7 +43,8 @@ export async function GET(request: NextRequest) {
     const resolvedDb = companyDb;
 
     // Fetch all customers (debtors)
-    const debtorPath = '/BusinessPartners' +
+    const debtorPath =
+      '/BusinessPartners' +
       `?$filter=${encodeURIComponent("CardType eq 'cCustomer'")}` +
       `&$select=${encodeURIComponent('CardCode,CardName,CreditLimit,CurrentAccountBalance')}` +
       `&$top=1000`;
@@ -55,7 +56,8 @@ export async function GET(request: NextRequest) {
     });
 
     // Fetch open invoices
-    const openInvoicePath = '/Invoices' +
+    const openInvoicePath =
+      '/Invoices' +
       `?$filter=${encodeURIComponent("DocumentStatus eq 'bost_Open'")}` +
       `&$select=${encodeURIComponent('DocEntry,DocNum,DocDueDate,DocTotal,DocCurrency')}` +
       `&$orderby=${encodeURIComponent('DocDueDate desc')}` +
@@ -68,7 +70,8 @@ export async function GET(request: NextRequest) {
     });
 
     // Fetch closed invoices (last 500 for recovery calc)
-    const closedInvoicePath = '/Invoices' +
+    const closedInvoicePath =
+      '/Invoices' +
       `?$filter=${encodeURIComponent("DocumentStatus eq 'bost_Close'")}` +
       `&$select=${encodeURIComponent('DocTotal')}` +
       `&$top=500`;
@@ -89,7 +92,9 @@ export async function GET(request: NextRequest) {
     const totalCreditSales = closedInv.reduce((sum, inv) => sum + inv.DocTotal, 0) + totalAr;
 
     // Risk segmentation
-    let alto = 0, medio = 0, bajo = 0;
+    let alto = 0,
+      medio = 0,
+      bajo = 0;
     for (const c of customers) {
       if (c.CreditLimit && c.CreditLimit > 0) {
         const ratio = (c.CurrentAccountBalance || 0) / c.CreditLimit;
@@ -104,26 +109,20 @@ export async function GET(request: NextRequest) {
     const totalCustomers = customers.length;
 
     // DSO simplified: (Total AR / Total Credit Sales) * 30
-    const dsoValue = totalCreditSales > 0
-      ? Math.round((totalAr / totalCreditSales) * 30 * 10) / 10
-      : 0;
+    const dsoValue =
+      totalCreditSales > 0 ? Math.round((totalAr / totalCreditSales) * 30 * 10) / 10 : 0;
 
     // Morosidad: % high risk debtors
-    const morosidadValue = totalCustomers > 0
-      ? Math.round((alto / totalCustomers) * 1000) / 10
-      : 0;
+    const morosidadValue = totalCustomers > 0 ? Math.round((alto / totalCustomers) * 1000) / 10 : 0;
 
     // Recuperación: closed / (open + closed) by amount
     const totalRecovered = closedInv.reduce((sum, inv) => sum + inv.DocTotal, 0);
     const totalRecoverable = totalAr + totalRecovered;
-    const recuperacionValue = totalRecoverable > 0
-      ? Math.round((totalRecovered / totalRecoverable) * 1000) / 10
-      : 0;
+    const recuperacionValue =
+      totalRecoverable > 0 ? Math.round((totalRecovered / totalRecoverable) * 1000) / 10 : 0;
 
     // Rotación: total credit sales / avg AR (simplified with current AR)
-    const rotacionValue = totalAr > 0
-      ? Math.round((totalCreditSales / totalAr) * 10) / 10
-      : 0;
+    const rotacionValue = totalAr > 0 ? Math.round((totalCreditSales / totalAr) * 10) / 10 : 0;
 
     const result: KpiResult = {
       dso: { value: dsoValue, description: 'Días promedio venta a cobro' },
@@ -146,7 +145,10 @@ export async function GET(request: NextRequest) {
       );
     }
     return NextResponse.json(
-      { error: 'INTERNAL_ERROR', message: error instanceof Error ? error.message : 'Error inesperado' },
+      {
+        error: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Error inesperado',
+      },
       { status: 500 }
     );
   }

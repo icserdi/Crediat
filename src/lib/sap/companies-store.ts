@@ -51,8 +51,8 @@ class SapCompaniesStore {
 
   /** Lista todas las empresas SAP. */
   listCompanies(): SapCompany[] {
-    return Array.from(this.companies.values()).sort(
-      (a, b) => a.friendlyName.localeCompare(b.friendlyName)
+    return Array.from(this.companies.values()).sort((a, b) =>
+      a.friendlyName.localeCompare(b.friendlyName)
     );
   }
 
@@ -63,17 +63,11 @@ class SapCompaniesStore {
 
   /** Obtiene una empresa por CompanyDB. */
   getCompanyByDb(companyDb: string): SapCompany | null {
-    return (
-      Array.from(this.companies.values()).find(
-        (c) => c.companyDb === companyDb
-      ) ?? null
-    );
+    return Array.from(this.companies.values()).find((c) => c.companyDb === companyDb) ?? null;
   }
 
   /** Crea una nueva empresa SAP. */
-  createCompany(
-    data: Omit<SapCompany, 'id' | 'createdAt' | 'updatedAt'>
-  ): SapCompany {
+  createCompany(data: Omit<SapCompany, 'id' | 'createdAt' | 'updatedAt'>): SapCompany {
     const now = new Date().toISOString();
     const company: SapCompany = {
       ...data,
@@ -85,9 +79,7 @@ class SapCompaniesStore {
     // Validar que no exista otra empresa con el mismo CompanyDB
     const existing = this.getCompanyByDb(data.companyDb);
     if (existing) {
-      throw new Error(
-        `Ya existe una empresa con CompanyDB "${data.companyDb}"`
-      );
+      throw new Error(`Ya existe una empresa con CompanyDB "${data.companyDb}"`);
     }
 
     const parsed = sapCompanySchema.parse(company);
@@ -107,9 +99,7 @@ class SapCompaniesStore {
     if (data.companyDb && data.companyDb !== existing.companyDb) {
       const duplicate = this.getCompanyByDb(data.companyDb);
       if (duplicate && duplicate.id !== id) {
-        throw new Error(
-          `Ya existe una empresa con CompanyDB "${data.companyDb}"`
-        );
+        throw new Error(`Ya existe una empresa con CompanyDB "${data.companyDb}"`);
       }
     }
 
