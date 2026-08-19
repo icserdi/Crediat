@@ -65,6 +65,11 @@ El sistema requiere conexión con SAP Business One v9.2 for HANA. Consultar el a
 
 La capa de IA usa [Vercel AI SDK](https://sdk.vercel.ai) y soporta dos proveedores configurables vía `AI_PROVIDER`:
 
+## Documentación de API
+
+La especificación completa de la API (OpenAPI 3.0) está en [`docs/api-openapi.yaml`](docs/api-openapi.yaml).
+Incluye autenticación OTP, datos SAP (deudores, facturas, KPIs), administración de empresas, interacciones, auditoría y endpoints de IA.
+
 ### OpenRouter (default)
 
 Multi-modelo: acceso a cientos de modelos (Claude, GPT, Llama, DeepSeek, etc.) con una sola API key.

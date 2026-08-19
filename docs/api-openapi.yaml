@@ -1,0 +1,509 @@
+openapi: 3.0.3
+info:
+  title: Crediat API
+  description: |
+    API del sistema Crediat — Gestión Inteligente de Crédito y Cobranza.
+    Incluye autenticación OTP, consulta de deudores/facturas/KPIs desde SAP B1,
+    gestión de empresas SAP, interacciones, auditoría y endpoints de IA.
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:3000
+    description: Local
+
+tags:
+  - name: Auth
+    description: Autenticación con OTP por email
+  - name: SAP
+    description: Datos de SAP Business One
+  - name: Admin
+    description: Administración de empresas SAP
+  - name: Interacciones
+    description: Bandeja unificada de gestiones
+  - name: IA
+    description: Flujos de inteligencia artificial
+  - name: Sistema
+    description: Salud y auditoría
+
+paths:
+  /api/health:
+    get:
+      tags: [Sistema]
+      summary: Healthcheck general
+      description: Verifica la configuración de secretos y el entorno.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  environment: { type: string, enum: [production, development] }
+                  secretsConfigured: { type: boolean }
+
+  /api/auth/send-otp:
+    post:
+      tags: [Auth]
+      summary: Enviar código OTP por email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '200':
+          description: Código enviado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  debugOtp: { type: string, description: Solo en desarrollo }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '403': { $ref: '#/components/responses/DomainNotAllowed' }
+
+  /api/auth/verify-otp:
+    post:
+      tags: [Auth]
+      summary: Verificar código OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, otp]
+              properties:
+                email: { type: string, format: email }
+                otp: { type: string }
+      responses:
+        '200':
+          description: Sesión iniciada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  role: { type: string, enum: [admin, supervisor, cobrador] }
+                  email: { type: string }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/InvalidOtp' }
+
+  /api/sap/health:
+    get:
+      tags: [SAP]
+      summary: Verifica la conexión con SAP Service Layer
+      parameters:
+        - { name: companyDb, in: query, schema: { type: string }, description: CompanyDB real }
+        - { name: companyId, in: query, schema: { type: string, format: uuid }, description: UUID interno de empresa }
+      responses:
+        '200':
+          description: Conexión SAP exitosa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  companyDb: { type: string }
+                  latencyMs: { type: number }
+                  version: { type: string }
+
+  /api/debtors:
+    get:
+      tags: [SAP]
+      summary: Lista deudores (Business Partners) desde SAP
+      parameters:
+        - { name: companyId, in: query, schema: { type: string, format: uuid } }
+        - { name: top, in: query, schema: { type: integer, default: 100 } }
+      responses:
+        '200':
+          description: Lista de deudores
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  debtors:
+                    type: array
+                    items: { $ref: '#/components/schemas/Debtor' }
+
+  /api/invoices:
+    get:
+      tags: [SAP]
+      summary: Lista de facturas desde SAP
+      parameters:
+        - { name: companyId, in: query, schema: { type: string, format: uuid } }
+        - { name: top, in: query, schema: { type: integer, default: 100 } }
+      responses:
+        '200':
+          description: Lista de facturas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invoices:
+                    type: array
+                    items: { $ref: '#/components/schemas/Invoice' }
+
+  /api/kpi:
+    get:
+      tags: [SAP]
+      summary: KPIs financieros desde SAP
+      parameters:
+        - { name: companyId, in: query, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: KPIs calculados
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KpiData' }
+
+  /api/analytics/data:
+    get:
+      tags: [SAP]
+      summary: Datos de analítica e IA
+      parameters:
+        - { name: companyId, in: query, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Analítica completa
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnalyticsData' }
+
+  /api/admin/sap-companies:
+    get:
+      tags: [Admin]
+      summary: Lista empresas SAP
+      responses:
+        '200':
+          description: Empresas configuradas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  companies:
+                    type: array
+                    items: { $ref: '#/components/schemas/SapCompany' }
+    post:
+      tags: [Admin]
+      summary: Crea una empresa SAP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SapCompanyInput' }
+      responses:
+        '201':
+          description: Empresa creada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SapCompany' }
+
+  /api/admin/sap-companies/{id}:
+    patch:
+      tags: [Admin]
+      summary: Actualiza una empresa SAP
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SapCompanyInput' }
+      responses:
+        '200':
+          description: Empresa actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SapCompany' }
+    delete:
+      tags: [Admin]
+      summary: Elimina una empresa SAP
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Empresa eliminada }
+
+  /api/admin/sap-companies/assignments:
+    post:
+      tags: [Admin]
+      summary: Asigna empresas a un usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, companyIds]
+              properties:
+                userId: { type: string }
+                companyIds:
+                  type: array
+                  items: { type: string, format: uuid }
+                assignedBy: { type: string }
+      responses:
+        '200':
+          description: Asignación creada
+
+  /api/interactions:
+    get:
+      tags: [Interacciones]
+      summary: Lista interacciones
+      parameters:
+        - { name: companyId, in: query, schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, default: 50 } }
+        - { name: debtorId, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Lista de interacciones
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  interactions:
+                    type: array
+                    items: { $ref: '#/components/schemas/Interaction' }
+    post:
+      tags: [Interacciones]
+      summary: Registra una interacción
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                companyDb: { type: string }
+                debtorId: { type: string }
+                debtorName: { type: string }
+                type: { type: string, enum: [WhatsApp, Email, Teléfono] }
+                content: { type: string }
+                direction: { type: string, enum: [inbound, outbound] }
+                assignedTo: { type: string }
+      responses:
+        '201':
+          description: Interacción registrada
+
+  /api/audit:
+    get:
+      tags: [Sistema]
+      summary: Logs de auditoría
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, default: 100 } }
+      responses:
+        '200':
+          description: Logs y estadísticas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items: { $ref: '#/components/schemas/AuditEvent' }
+                  stats:
+                    type: object
+
+  /api/ai/predict-cash-flow:
+    post:
+      tags: [IA]
+      summary: Predice el flujo de caja futuro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [historicalData, predictionHorizonDays]
+              properties:
+                historicalData:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      date: { type: string, format: date }
+                      amount: { type: number }
+                predictionHorizonDays: { type: integer, minimum: 1 }
+                additionalContext: { type: string }
+      responses:
+        '200':
+          description: Predicción generada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  predictedCollections:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date: { type: string }
+                        amount: { type: number }
+                  confidenceScore: { type: number, minimum: 0, maximum: 1 }
+                  summary: { type: string }
+        '400': { $ref: '#/components/responses/ValidationError' }
+
+  /api/ai/generate-message:
+    post:
+      tags: [IA]
+      summary: Genera un mensaje de cobranza por IA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [debtorId, riskScore]
+              properties:
+                debtorId: { type: string }
+                riskScore: { type: number, minimum: 0, maximum: 1 }
+                daysOverdue: { type: integer, minimum: 0 }
+                invoiceAmount: { type: number }
+                invoiceCurrency: { type: string, default: MXN }
+                invoiceDueDate: { type: string, format: date }
+                communicationChannel: { type: string, enum: [WhatsApp, Email] }
+      responses:
+        '200':
+          description: Mensaje generado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  llmUsed: { type: string }
+        '400': { $ref: '#/components/responses/ValidationError' }
+
+components:
+  schemas:
+    Debtor:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: [string, 'null'] }
+        balance: { type: number }
+        risk: { type: string, enum: [Bajo, Moderado, Alto] }
+        score: { type: number }
+        status: { type: string }
+        creditLine: { type: [number, 'null'] }
+
+    Invoice:
+      type: object
+      properties:
+        docEntry: { type: integer }
+        docNum: { type: integer }
+        cardCode: { type: string }
+        cardName: { type: string }
+        date: { type: string }
+        dueDate: { type: string }
+        total: { type: number }
+        currency: { type: string }
+        status: { type: string, enum: [Pagada, Pendiente, Vencida, Parcial] }
+        daysOverdue: { type: integer }
+
+    KpiData:
+      type: object
+      properties:
+        dso: { type: object }
+        morosidad: { type: object }
+        recuperacion: { type: object }
+        rotacion: { type: object }
+        totalAr: { type: number }
+        totalDebtors: { type: integer }
+        companyDb: { type: string }
+
+    AnalyticsData:
+      type: object
+      properties:
+        kpi: { type: object }
+        cashFlowProjection: { type: array }
+        monthlyTrend: { type: array }
+        insights: { type: array }
+        totalDebtors: { type: integer }
+        totalAr: { type: number }
+        asOf: { type: string, format: date-time }
+
+    SapCompany:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        companyDb: { type: string }
+        friendlyName: { type: string }
+        description: { type: string }
+        isActive: { type: boolean }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+
+    SapCompanyInput:
+      type: object
+      required: [companyDb, friendlyName]
+      properties:
+        companyDb: { type: string }
+        friendlyName: { type: string }
+        description: { type: string }
+        isActive: { type: boolean, default: true }
+
+    Interaction:
+      type: object
+      properties:
+        id: { type: string }
+        debtor_name: { type: string }
+        type: { type: string }
+        content: { type: string }
+        assigned_to: { type: string }
+        created_at: { type: string }
+
+    AuditEvent:
+      type: object
+      properties:
+        id: { type: string }
+        event_type: { type: string }
+        severity: { type: string }
+        actor: { type: string }
+        description: { type: string }
+        created_at: { type: string }
+
+  responses:
+    ValidationError:
+      description: Error de validación
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: { type: string }
+              message: { type: string }
+    DomainNotAllowed:
+      description: Dominio de correo no autorizado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: { type: string, enum: [DOMAIN_NOT_ALLOWED] }
+              message: { type: string }
+    InvalidOtp:
+      description: OTP inválido o expirado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error: { type: string, enum: [INVALID_OTP] }
+              message: { type: string }
