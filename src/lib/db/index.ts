@@ -80,11 +80,14 @@ export async function initializeDb(): Promise<void> {
       advisor VARCHAR(200) NOT NULL,
       email VARCHAR(200) NOT NULL,
       phone VARCHAR(50) NOT NULL,
+      rfc VARCHAR(13),
       status VARCHAR(30) NOT NULL DEFAULT 'recibida',
       metadata JSONB DEFAULT '{}',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
+    ALTER TABLE credit_applications ADD COLUMN IF NOT EXISTS rfc VARCHAR(13);
 
     CREATE INDEX IF NOT EXISTS idx_credit_applications_created_at ON credit_applications(created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_credit_applications_status ON credit_applications(status);

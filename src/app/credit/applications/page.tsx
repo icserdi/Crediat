@@ -65,6 +65,7 @@ export default function CreditApplicationsPage() {
                     <TableHead className="font-bold">Solicitante</TableHead>
                     <TableHead className="font-bold">Tipo</TableHead>
                     <TableHead className="font-bold">Ubicación</TableHead>
+                    <TableHead className="font-bold">RFC</TableHead>
                     <TableHead className="font-bold">Contacto</TableHead>
                     <TableHead className="font-bold">Estatus</TableHead>
                     <TableHead className="font-bold">Fecha</TableHead>
@@ -93,6 +94,9 @@ export default function CreditApplicationsPage() {
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {app.city}, {app.state}
+                        </TableCell>
+                        <TableCell className="font-mono text-xs text-muted-foreground">
+                          {app.rfc || '-'}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           <div>{app.email}</div>

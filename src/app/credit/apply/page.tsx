@@ -19,6 +19,7 @@ type FormState = {
   advisor: string;
   email: string;
   phone: string;
+  rfc: string;
   files: File[];
 };
 
@@ -30,6 +31,7 @@ const initialForm: FormState = {
   advisor: '',
   email: '',
   phone: '',
+  rfc: '',
   files: [],
 };
 
@@ -61,6 +63,7 @@ export default function CreditApplyPage() {
       advisor: form.advisor,
       email: form.email,
       phone: form.phone,
+      rfc: form.rfc,
       files: form.files,
     });
 
@@ -183,6 +186,19 @@ export default function CreditApplyPage() {
                   onChange={(e) => update('fullName', e.target.value)}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-bold uppercase text-muted-foreground">RFC</Label>
+                <Input
+                  placeholder="Ej. GARC840101HDFRRN01"
+                  value={form.rfc}
+                  onChange={(e) => update('rfc', e.target.value)}
+                  maxLength={13}
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Opcional. Se valida formato y, si hay proveedor configurado, estatus fiscal.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

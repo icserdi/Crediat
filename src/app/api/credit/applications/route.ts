@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
       advisor: String(formData.get('advisor') || ''),
       email: String(formData.get('email') || ''),
       phone: String(formData.get('phone') || ''),
+      rfc: String(formData.get('rfc') || '') || undefined,
     };
 
     const errors = validateCreditApplication(input);

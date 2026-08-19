@@ -2,6 +2,7 @@
 
 import { query } from '@/lib/db';
 import { logAuditEvent } from '@/lib/db';
+import { validateRfcFormat } from './rfc';
 
 /** Tipo de persona en la solicitud de crédito. */
 export type PersonType = 'fisica' | 'moral';
@@ -17,6 +18,8 @@ export type CreditApplicationInput = {
   advisor: string;
   email: string;
   phone: string;
+  /** RFC del solicitante (opcional; se valida formato y opcionalmente fiscal). */
+  rfc?: string;
   /** Archivos a subir (solo en el cliente). */
   files?: File[];
   /** Claves de los archivos ya subidos a MinIO (uso interno). */
@@ -85,6 +88,9 @@ export function validateCreditApplication(input: CreditApplicationInput): string
   if (!input.advisor?.trim()) errors.push('El asesor que atiende es requerido.');
   if (!isValidEmail(input.email)) errors.push('Correo electrónico inválido.');
   if (!isValidPhone(input.phone)) errors.push('Teléfono inválido (10-15 dígitos).');
+  if (input.rfc && !validateRfcFormat(input.rfc, input.personType)) {
+    errors.push('El RFC no tiene un formato válido.');
+  }
 
   return errors;
 }
@@ -100,10 +106,10 @@ export async function createCreditApplication(
 
   const rows = await query<CreditApplication>(
     `INSERT INTO credit_applications
-       (person_type, full_name, city, state, advisor, email, phone, status, metadata)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, 'recibida', $8)
+       (person_type, full_name, city, state, advisor, email, phone, rfc, status, metadata)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'recibida', $9)
      RETURNING id, person_type AS "personType", full_name AS "fullName", city, state,
-               advisor, email, phone, status, metadata, created_at AS "createdAt", updated_at AS "updatedAt"`,
+               advisor, email, phone, rfc, status, metadata, created_at AS "createdAt", updated_at AS "updatedAt"`,
     [
       input.personType,
       input.fullName.trim(),
@@ -112,6 +118,7 @@ export async function createCreditApplication(
       input.advisor.trim(),
       input.email.trim(),
       input.phone.trim(),
+      input.rfc?.trim().toUpperCase() || null,
       JSON.stringify({ attachments: input.attachments || [] }),
     ]
   );
@@ -133,7 +140,7 @@ export async function createCreditApplication(
 export async function listCreditApplications(limit = 100): Promise<CreditApplication[]> {
   return query<CreditApplication>(
     `SELECT id, person_type AS "personType", full_name AS "fullName", city, state, advisor,
-            email, phone, status, metadata, created_at AS "createdAt", updated_at AS "updatedAt"
+            email, phone, rfc, status, metadata, created_at AS "createdAt", updated_at AS "updatedAt"
      FROM credit_applications
      ORDER BY created_at DESC
      LIMIT $1`,
@@ -156,7 +163,7 @@ export async function updateCreditApplicationStatus(
      SET status = $2, updated_at = NOW()
      WHERE id = $1
      RETURNING id, person_type AS "personType", full_name AS "fullName", city, state, advisor,
-               email, phone, status, metadata, created_at AS "createdAt", updated_at AS "updatedAt"`,
+               email, phone, rfc, status, metadata, created_at AS "createdAt", updated_at AS "updatedAt"`,
     [id, status]
   );
 

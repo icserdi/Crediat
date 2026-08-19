@@ -60,6 +60,15 @@ documentales varían según el tipo.
   en la carpeta `credit-applications/`. El bucket se crea automáticamente al levantar docker
   (servicio `minio-init`). Si MinIO no está configurado, la solicitud se guarda sin archivos.
 
+## Validación de RFC
+
+- Se valida el **formato** del RFC según el tipo de persona (física: 13 caracteres; moral: 12)
+  en `src/lib/credit/rfc.ts`.
+- Si se configura `RFC_VALIDATION_API_URL` (proveedor de validación fiscal, ej. CS Facturación,
+  Origoid, SAT Go), se consulta el **estatus fiscal** en el SAT al crear la solicitud.
+- Endpoint de validación: `POST /api/credit/rfc-validate` (body: `{ rfc, tipo }`).
+- Sin proveedor configurado, solo se valida el formato (sin red).
+
 ## Endpoints
 
 | Endpoint                        | Método | Descripción          |
