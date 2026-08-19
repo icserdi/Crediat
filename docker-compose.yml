@@ -23,6 +23,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - collections-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # Cache and Message Queue
   redis:
@@ -35,6 +41,11 @@ services:
       - redis_data:/data
     networks:
       - collections-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Object Storage (S3 Compatible)
   minio:
@@ -49,9 +60,14 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadminpassword}
     volumes:
       - minio_data:/data
-    command: server /data --console-address ":9001"
+    command: server /data --console-address ':9001'
     networks:
       - collections-network
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Backend (Next.js Application)
   app:
@@ -70,11 +86,20 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadminpassword}
     depends_on:
-      - db
-      - redis
-      - minio
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     networks:
       - collections-network
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://localhost:3000/api/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 networks:
   collections-network:

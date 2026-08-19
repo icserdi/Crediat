@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-19T07:13:00.664Z
+- Última validación automática: 2026-08-19T07:18:55.678Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -107,7 +107,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 ### Infraestructura y observabilidad
 
-- [ ] Agregar `healthcheck` a los servicios de `docker-compose.yml` (db, redis, minio, app).
+- [x] Agregar `healthcheck` a los servicios de `docker-compose.yml` (db, redis, minio, app).
 - [ ] Logging estructurado, métricas y tracing (OpenTelemetry) para producción.
 - [ ] Documentación de API con OpenAPI/Swagger para los endpoints.
 
