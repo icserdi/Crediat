@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-19T16:31:30.819Z
+- Última validación automática: 2026-08-19T16:36:36.788Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -117,6 +117,51 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [x] Extraer clases utilitarias repetidas en las páginas hacia componentes/tokens reutilizables (hoy hay `rounded-3xl`, `shadow-2xl`, `text-[10px]`, etc. hardcodeados).
 - [x] Centralizar el diseño en tokens de tema (ya hay variables CSS para colores/fuentes) para que un rediseño no toque código funcional.
 - [x] Mover lógica de negocio (fetch, localStorage, autenticación) fuera de los componentes de página hacia capas/servicios dedicados.
+
+## Ciclo de Vida del Crédito — Plan de implementación
+
+> La app gestiona todo el ciclo de vida del crédito (solicitud → pre-calificación → otorgamiento
+> → expediente/vigencia → seguimiento → cobranza → recuperación). Ver `docs/credit-lifecycle-plan.md`.
+
+### Fase 1 — Workflow de Solicitud (base)
+
+- [ ] Modelo de estatus/etapas de la solicitud (`solicitud_enviada`, `en_revision`, `precalificada`, `aprobada`, `rechazada`).
+- [ ] Vista de detalle de solicitud `/credit/applications/[id]` con documentos adjuntos (MinIO).
+- [ ] Acciones por estatus (iniciar pre-calificación, rechazar con motivo).
+- [ ] Audit trail completo de la solicitud.
+
+### Fase 2 — Pre-calificación
+
+- [ ] Modelo `prequalification` (score preliminar, resultado: aprobado / condicionado / rechazado).
+- [ ] Cálculo de score desde datos (RFC vigente, historial, límites, ingresos).
+- [ ] Reglas configurables (montos mín/max, ratios deuda/ingreso, antigüedad).
+- [ ] Integración con validación fiscal SAT (`/api/credit/rfc-validate`).
+- [ ] UI de pre-calificación por solicitud + listado.
+
+### Fase 3 — Otorgamiento de crédito con flujos de autorización
+
+- [ ] Modelo `credit_account` / `credit_grant` (monto, plazo, tasa, condiciones).
+- [ ] Flujo de autorización multinivel (roles y jerarquía: cobrador → supervisor → dirección).
+- [ ] Tabla `approvals` (nivel, aprobador, decisión, comentarios, fecha).
+- [ ] Reglas de monto de autorización por nivel.
+- [ ] Registro del crédito otorgado (numeración/contrato).
+- [ ] Notificación (email) a cliente y aprobadores.
+
+### Fase 4 — Gestión de expendiente de crédito (vigencia y renovación)
+
+- [ ] Modelos `expediente_documento` + `expediente_vigencia`.
+- [ ] Carga de documentos (MinIO) con fechas de emisión y expiración (INE, RFC, CURP, acta, estados de cuenta).
+- [ ] Módulo de listado por cliente `/credit/expedientes` con estado del documento (vigente / por vencer / vencido).
+- [ ] Alertas de vigencia: notificar N días antes de expirar (configurable) y marcar vencidos.
+- [ ] Workflow de renovación (subir documento actualizado, re-validar).
+- [ ] Dashboard de alertas (por vencer/vencidos) + notificaciones.
+
+### Fase 5 — Integración con el resto del ciclo
+
+- [ ] Relacionar crédito con deudor SAP (CardCode), facturas e interacciones.
+- [ ] KPIs por crédito/cliente (saldo, pagos, morosidad).
+- [ ] Vinculación con IA (analítica, mensajes de cobranza).
+- [ ] Reportes del ciclo completo (solicitud → otorgado → cobrado).
 
 ## Post-MVP — Funcionalidades a evaluar
 

@@ -37,6 +37,12 @@ type CompanyOption = {
 
 const navItems = [
   {
+    icon: CreditCard,
+    label: 'Solicitudes de Crédito',
+    href: '/credit/applications',
+    roles: ['admin', 'supervisor'],
+  },
+  {
     icon: LayoutDashboard,
     label: 'Tablero Control',
     href: '/',
@@ -59,12 +65,6 @@ const navItems = [
     label: 'Bandeja Unificada',
     href: '/interactions',
     roles: ['admin', 'supervisor', 'cobrador'],
-  },
-  {
-    icon: CreditCard,
-    label: 'Solicitudes de Crédito',
-    href: '/credit/applications',
-    roles: ['admin', 'supervisor'],
   },
   { icon: TrendingUp, label: 'IA Analítica', href: '/analytics', roles: ['admin', 'supervisor'] },
   { icon: ShieldCheck, label: 'Logs de Auditoría', href: '/audit', roles: ['admin'] },
