@@ -82,3 +82,4 @@ describe('isSapServiceLayerError', () => {
     expect(isSapServiceLayerError(null)).toBe(false);
   });
 });
+
