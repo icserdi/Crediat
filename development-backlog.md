@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-19T07:08:42.668Z
+- Última validación automática: 2026-08-19T07:13:00.664Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -90,7 +90,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 - [x] Eliminar credenciales hardcodeadas de `docker-compose.yml` (`password123`, `minioadminpassword`) y moverlas a variables de entorno / secrets.
 - [x] Mitigar vulnerabilidades de `npm audit` eliminando genkit (62 transitivas resueltas). Quedan 3 altas de `sharp` (dependencia de Next.js), con fix vía `next@16` (breaking change) pendiente.
-- [ ] Evaluar gestor de secretos para producción (no exponer `.env` ni claves en el repo).
+- [x] Evaluar gestor de secretos para producción: capa centralizada `src/lib/secrets/` + doc `docs/secrets-management.md` + endpoint `/api/health` que valida secretos en prod.
 
 ### Migración de IA (genkit → Vercel AI SDK)
 
