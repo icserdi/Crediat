@@ -13,18 +13,29 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { RefreshCw, Building2 } from 'lucide-react';
+import Link from 'next/link';
 import { useCreditApplications } from '@/hooks/use-credit-applications';
 import { PageHeader } from '@/components/shared/page-header';
-import type { CreditApplicationStatus } from '@/lib/credit/application';
+import { STATUS_LABELS, type CreditApplicationStatus } from '@/lib/credit/application';
 
 const statusConfig: Record<CreditApplicationStatus, { label: string; className: string }> = {
-  recibida: { label: 'Recibida', className: 'bg-blue-50 text-blue-700 border-blue-200' },
+  solicitud_enviada: {
+    label: STATUS_LABELS.solicitud_enviada,
+    className: 'bg-blue-50 text-blue-700 border-blue-200',
+  },
   en_revision: {
-    label: 'En revisión',
+    label: STATUS_LABELS.en_revision,
     className: 'bg-orange-50 text-orange-700 border-orange-200',
   },
-  aprobada: { label: 'Aprobada', className: 'bg-green-50 text-green-700 border-green-200' },
-  rechazada: { label: 'Rechazada', className: 'bg-red-50 text-red-700 border-red-200' },
+  precalificada: {
+    label: STATUS_LABELS.precalificada,
+    className: 'bg-purple-50 text-purple-700 border-purple-200',
+  },
+  aprobada: {
+    label: STATUS_LABELS.aprobada,
+    className: 'bg-green-50 text-green-700 border-green-200',
+  },
+  rechazada: { label: STATUS_LABELS.rechazada, className: 'bg-red-50 text-red-700 border-red-200' },
 };
 
 export default function CreditApplicationsPage() {
@@ -73,7 +84,7 @@ export default function CreditApplicationsPage() {
                 </TableHeader>
                 <TableBody>
                   {applications.map((app) => {
-                    const status = statusConfig[app.status] || statusConfig.recibida;
+                    const status = statusConfig[app.status] || statusConfig.solicitud_enviada;
                     return (
                       <TableRow
                         key={app.id}
@@ -84,7 +95,12 @@ export default function CreditApplicationsPage() {
                             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-sm shadow-md">
                               {app.fullName[0]}
                             </div>
-                            <span className="font-bold text-primary">{app.fullName}</span>
+                            <Link
+                              href={`/credit/applications/${app.id}`}
+                              className="font-bold text-primary hover:text-accent transition-colors"
+                            >
+                              {app.fullName}
+                            </Link>
                           </div>
                         </TableCell>
                         <TableCell>

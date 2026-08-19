@@ -81,7 +81,7 @@ export async function initializeDb(): Promise<void> {
       email VARCHAR(200) NOT NULL,
       phone VARCHAR(50) NOT NULL,
       rfc VARCHAR(13),
-      status VARCHAR(30) NOT NULL DEFAULT 'recibida',
+      status VARCHAR(30) NOT NULL DEFAULT 'solicitud_enviada',
       metadata JSONB DEFAULT '{}',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

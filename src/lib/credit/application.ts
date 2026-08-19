@@ -7,8 +7,27 @@ import { validateRfcFormat } from './rfc';
 /** Tipo de persona en la solicitud de crédito. */
 export type PersonType = 'fisica' | 'moral';
 
-/** Estados de una solicitud de crédito. */
-export type CreditApplicationStatus = 'recibida' | 'en_revision' | 'aprobada' | 'rechazada';
+/** Estados de una solicitud de crédito (workflow del ciclo de vida). */
+export type CreditApplicationStatus =
+  'solicitud_enviada' | 'en_revision' | 'precalificada' | 'aprobada' | 'rechazada';
+
+/** Transiciones válidas entre estatus. */
+export const STATUS_TRANSITIONS: Record<CreditApplicationStatus, CreditApplicationStatus[]> = {
+  solicitud_enviada: ['en_revision', 'rechazada'],
+  en_revision: ['precalificada', 'rechazada'],
+  precalificada: ['aprobada', 'rechazada'],
+  aprobada: [],
+  rechazada: [],
+};
+
+/** Etiquetas legibles de cada estatus. */
+export const STATUS_LABELS: Record<CreditApplicationStatus, string> = {
+  solicitud_enviada: 'Solicitud enviada',
+  en_revision: 'En revisión',
+  precalificada: 'Pre-calificada',
+  aprobada: 'Aprobada',
+  rechazada: 'Rechazada',
+};
 
 export type CreditApplicationInput = {
   personType: PersonType;
@@ -29,6 +48,16 @@ export type CreditApplicationInput = {
 export type CreditApplication = CreditApplicationInput & {
   id: string;
   status: CreditApplicationStatus;
+  metadata?: {
+    attachments?: string[];
+    lastReview?: {
+      status: CreditApplicationStatus;
+      reason?: string | null;
+      reviewedBy?: string | null;
+      at?: string;
+    };
+    [key: string]: unknown;
+  };
   createdAt: string;
   updatedAt: string;
 };
@@ -107,7 +136,7 @@ export async function createCreditApplication(
   const rows = await query<CreditApplication>(
     `INSERT INTO credit_applications
        (person_type, full_name, city, state, advisor, email, phone, rfc, status, metadata)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'recibida', $9)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'solicitud_enviada', $9)
      RETURNING id, person_type AS "personType", full_name AS "fullName", city, state,
                advisor, email, phone, rfc, status, metadata, created_at AS "createdAt", updated_at AS "updatedAt"`,
     [
@@ -148,35 +177,81 @@ export async function listCreditApplications(limit = 100): Promise<CreditApplica
   );
 }
 
-/** Actualiza el estatus de una solicitud. */
+/** Actualiza el estatus de una solicitud validando las transiciones del workflow. */
 export async function updateCreditApplicationStatus(
   id: string,
-  status: CreditApplicationStatus
+  status: CreditApplicationStatus,
+  opts: { reason?: string; actor?: string } = {}
 ): Promise<CreditApplication | null> {
-  const allowed: CreditApplicationStatus[] = ['recibida', 'en_revision', 'aprobada', 'rechazada'];
+  const allowed = Object.keys(STATUS_TRANSITIONS) as CreditApplicationStatus[];
   if (!allowed.includes(status)) {
     throw new Error('Estatus inválido.');
   }
 
+  // Leer estatus actual para validar transición
+  const currentRows = await query<{ status: CreditApplicationStatus }>(
+    `SELECT status FROM credit_applications WHERE id = $1`,
+    [id]
+  );
+  const current = currentRows[0]?.status;
+  if (!current) return null;
+
+  const validTransitions = STATUS_TRANSITIONS[current] || [];
+  if (status !== current && !validTransitions.includes(status)) {
+    throw new Error(`Transición inválida: ${STATUS_LABELS[current]} → ${STATUS_LABELS[status]}.`);
+  }
+
+  // Si se rechaza, exigir motivo
+  if (status === 'rechazada' && !opts.reason?.trim()) {
+    throw new Error('Debe indicar el motivo del rechazo.');
+  }
+
   const rows = await query<CreditApplication>(
     `UPDATE credit_applications
-     SET status = $2, updated_at = NOW()
+     SET status = $2, updated_at = NOW(),
+         metadata = metadata || $3::jsonb
      WHERE id = $1
      RETURNING id, person_type AS "personType", full_name AS "fullName", city, state, advisor,
                email, phone, rfc, status, metadata, created_at AS "createdAt", updated_at AS "updatedAt"`,
-    [id, status]
+    [
+      id,
+      status,
+      JSON.stringify({
+        lastReview: {
+          status,
+          reason: opts.reason?.trim() || null,
+          reviewedBy: opts.actor || null,
+          at: new Date().toISOString(),
+        },
+      }),
+    ]
   );
 
   if (rows[0]) {
     await logAuditEvent({
       eventType: 'credit_application_status',
-      severity: 'info',
+      severity: status === 'rechazada' ? 'warning' : 'info',
       entityType: 'credit_application',
       entityId: id,
-      description: `Solicitud de crédito ${id} cambió a estatus ${status}`,
-      metadata: { status },
+      actor: opts.actor || 'Sistema',
+      description: `Solicitud ${id} cambió a estatus ${STATUS_LABELS[status]}${
+        opts.reason ? ` (motivo: ${opts.reason})` : ''
+      }`,
+      metadata: { status, reason: opts.reason || null },
     });
   }
 
+  return rows[0] || null;
+}
+
+/** Obtiene una solicitud por ID. */
+export async function getCreditApplication(id: string): Promise<CreditApplication | null> {
+  const rows = await query<CreditApplication>(
+    `SELECT id, person_type AS "personType", full_name AS "fullName", city, state, advisor,
+            email, phone, rfc, status, metadata, created_at AS "createdAt", updated_at AS "updatedAt"
+     FROM credit_applications
+     WHERE id = $1`,
+    [id]
+  );
   return rows[0] || null;
 }

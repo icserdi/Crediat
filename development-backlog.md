@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-19T16:36:36.788Z
+- Última validación automática: 2026-08-19T16:47:21.447Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -125,10 +125,12 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 ### Fase 1 — Workflow de Solicitud (base)
 
-- [ ] Modelo de estatus/etapas de la solicitud (`solicitud_enviada`, `en_revision`, `precalificada`, `aprobada`, `rechazada`).
-- [ ] Vista de detalle de solicitud `/credit/applications/[id]` con documentos adjuntos (MinIO).
-- [ ] Acciones por estatus (iniciar pre-calificación, rechazar con motivo).
-- [ ] Audit trail completo de la solicitud.
+- [x] Modelo de estatus/etapas de la solicitud (`solicitud_enviada`, `en_revision`, `precalificada`, `aprobada`, `rechazada`) con transiciones válidas.
+- [x] Vista de detalle de solicitud `/credit/applications/[id]` con documentos adjuntos (MinIO).
+- [x] Acciones por estatus (mover a siguiente etapa, rechazar con motivo obligatorio).
+- [x] Audit trail de los cambios de estatus (registro en `audit_logs` con motivo y actor).
+- [x] Endpoint GET `/api/credit/applications/[id]` para detalle.
+- [x] Tests de transiciones del workflow.
 
 ### Fase 2 — Pre-calificación
 

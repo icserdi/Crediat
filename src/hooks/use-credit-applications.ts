@@ -72,5 +72,47 @@ export function useCreditApplications() {
     [load]
   );
 
-  return { applications, isLoading, error, isSubmitting, reload: load, create };
+  /** Obtiene una solicitud por ID. */
+  const get = useCallback(async (id: string) => {
+    const response = await fetch(`/api/credit/applications/${id}`);
+    const data = await response.json();
+    return data.application ?? null;
+  }, []);
+
+  /** Actualiza el estatus de una solicitud. */
+  const updateStatus = useCallback(
+    async (
+      id: string,
+      status: CreditApplication['status'],
+      reason?: string
+    ): Promise<{ ok: boolean; message?: string }> => {
+      try {
+        const response = await fetch(`/api/credit/applications/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status, reason }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          await load();
+          return { ok: true };
+        }
+        return { ok: false, message: data.message || 'Error al actualizar estatus' };
+      } catch {
+        return { ok: false, message: 'Error de conexión al servidor' };
+      }
+    },
+    [load]
+  );
+
+  return {
+    applications,
+    isLoading,
+    error,
+    isSubmitting,
+    reload: load,
+    create,
+    get,
+    updateStatus,
+  };
 }

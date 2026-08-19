@@ -129,6 +129,10 @@ curl http://localhost:3000/api/sap/health?companyId=<uuid>
 - `development-backlog.md`: avance contra roadmap + próximos pasos.
 - `release-and-deploy-flow.md`: estrategia Gitea/GitHub + Coolify/Dokploy.
 - `roadmap.md`: plan de sprints hacia MVP.
+- `docs/credit-lifecycle-plan.md`: plan del ciclo de vida del crédito (solicitud → otorgamiento → expediente → cobranza).
+- `docs/credit-application.md`: criterios y funcionamiento del módulo de solicitud de crédito.
+- `docs/api-openapi.yaml`: especificación OpenAPI de la API.
+- `docs/secrets-management.md`: gestión de secretos en producción.
 
 Para registrar automáticamente validaciones técnicas:
 
