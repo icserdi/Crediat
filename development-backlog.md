@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-19T16:47:21.447Z
+- Última validación automática: 2026-08-19T21:09:14.872Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -134,11 +134,13 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 ### Fase 2 — Pre-calificación
 
-- [ ] Modelo `prequalification` (score preliminar, resultado: aprobado / condicionado / rechazado).
-- [ ] Cálculo de score desde datos (RFC vigente, historial, límites, ingresos).
-- [ ] Reglas configurables (montos mín/max, ratios deuda/ingreso, antigüedad).
-- [ ] Integración con validación fiscal SAT (`/api/credit/rfc-validate`).
-- [ ] UI de pre-calificación por solicitud + listado.
+- [x] Modelo `prequalification` (score preliminar, resultado: aprobado / condicionado / rechazado).
+- [x] Cálculo de score desde datos (RFC vigente, historial, límites, ingresos).
+- [x] Reglas configurables (montos mín/max, ratios deuda/ingreso, antigüedad).
+- [x] Integración con validación fiscal SAT (`/api/credit/rfc-validate`).
+- [x] UI de pre-calificación por solicitud (formulario + resultado en detalle).
+- [x] Endpoint `POST /api/credit/prequalify` + tabla `prequalifications` + auditoría.
+- [x] Tests de score y resultado.
 
 ### Fase 3 — Otorgamiento de crédito con flujos de autorización
 

@@ -94,9 +94,24 @@ export async function initializeDb(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_credit_applications_email ON credit_applications(email);
   `;
 
+  const createPrequalifications = `
+    CREATE TABLE IF NOT EXISTS prequalifications (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      application_id UUID NOT NULL REFERENCES credit_applications(id) ON DELETE CASCADE,
+      score INTEGER NOT NULL,
+      result VARCHAR(20) NOT NULL CHECK (result IN ('aprobado', 'condicionado', 'rechazado')),
+      reasons JSONB DEFAULT '[]',
+      details JSONB DEFAULT '{}',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_prequalifications_application ON prequalifications(application_id);
+  `;
+
   await query(createInteractions);
   await query(createAuditLogs);
   await query(createCreditApplications);
+  await query(createPrequalifications);
 }
 
 export async function logAuditEvent(params: {

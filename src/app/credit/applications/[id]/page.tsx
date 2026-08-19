@@ -3,14 +3,16 @@
 import { use, useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, FileText, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCircle2, XCircle, RefreshCw, Gauge } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useCreditApplications } from '@/hooks/use-credit-applications';
+import { usePrequalification } from '@/hooks/use-prequalification';
 import {
   STATUS_LABELS,
   STATUS_TRANSITIONS,
@@ -37,6 +39,15 @@ export default function CreditApplicationDetailPage({
   const [application, setApplication] = useState<CreditApplication | null>(null);
   const [loading, setLoading] = useState(true);
   const [reason, setReason] = useState('');
+
+  const {
+    isRunning: preqRunning,
+    result: preqResult,
+    run: runPrequalification,
+  } = usePrequalification();
+  const [preqIncome, setPreqIncome] = useState('');
+  const [preqAmount, setPreqAmount] = useState('');
+  const [preqAge, setPreqAge] = useState('');
 
   // Cargar detalle desde el listado si ya está, o buscarlo por ID
   useEffect(() => {
@@ -68,6 +79,28 @@ export default function CreditApplicationDetailPage({
     } else {
       toast({
         title: 'Error',
+        description: result.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handlePrequalify = async () => {
+    if (!application) return;
+    const result = await runPrequalification({
+      applicationId: application.id,
+      personType: application.personType,
+      rfc: application.rfc,
+      declaredIncome: preqIncome ? Number(preqIncome) : undefined,
+      requestedAmount: preqAmount ? Number(preqAmount) : undefined,
+      businessAgeYears: preqAge ? Number(preqAge) : undefined,
+    });
+    if (result.ok) {
+      toast({ title: 'Pre-calificación completada' });
+      reload();
+    } else {
+      toast({
+        title: 'Error en pre-calificación',
         description: result.message,
         variant: 'destructive',
       });
@@ -188,6 +221,90 @@ export default function CreditApplicationDetailPage({
                     );
                   })}
                 </ul>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Pre-calificación */}
+          <Card className="lg:col-span-3 border-none shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg text-primary">
+                <Gauge className="w-5 h-5" /> Pre-calificación
+              </CardTitle>
+              <CardDescription>
+                Evalúe preliminarmente la viabilidad del crédito (score y resultado).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase text-muted-foreground">
+                    Ingreso declarado (MXN)
+                  </Label>
+                  <Input
+                    type="number"
+                    placeholder="Ej. 50000"
+                    value={preqIncome}
+                    onChange={(e) => setPreqIncome(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase text-muted-foreground">
+                    Monto solicitado (MXN)
+                  </Label>
+                  <Input
+                    type="number"
+                    placeholder="Ej. 200000"
+                    value={preqAmount}
+                    onChange={(e) => setPreqAmount(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase text-muted-foreground">
+                    Antigüedad negocio (años)
+                  </Label>
+                  <Input
+                    type="number"
+                    placeholder="Ej. 3"
+                    value={preqAge}
+                    onChange={(e) => setPreqAge(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <Button
+                onClick={handlePrequalify}
+                disabled={preqRunning}
+                className="bg-accent hover:bg-accent/90 gap-2"
+              >
+                <Gauge className="w-4 h-4" />
+                {preqRunning ? 'Pre-calificando...' : 'Ejecutar pre-calificación'}
+              </Button>
+
+              {preqResult && (
+                <div className="p-4 rounded-xl border space-y-2">
+                  <div className="flex items-center gap-3">
+                    <Badge
+                      className={
+                        preqResult.result === 'aprobado'
+                          ? 'bg-green-50 text-green-700 border-green-200'
+                          : preqResult.result === 'condicionado'
+                            ? 'bg-orange-50 text-orange-700 border-orange-200'
+                            : 'bg-red-50 text-red-700 border-red-200'
+                      }
+                    >
+                      {preqResult.result}
+                    </Badge>
+                    <span className="font-bold text-primary">Score: {preqResult.score}/100</span>
+                  </div>
+                  {preqResult.reasons.length > 0 && (
+                    <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
+                      {preqResult.reasons.map((r, i) => (
+                        <li key={i}>{r}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>
