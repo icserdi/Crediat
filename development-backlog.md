@@ -3,7 +3,7 @@
 Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en "qué sigue" al retomar el proyecto.
 
 <!-- AUTO:LAST_VALIDATED_START -->
-- Última validación automática: 2026-08-19T06:42:52.469Z
+- Última validación automática: 2026-08-19T06:43:06.125Z
 <!-- AUTO:LAST_VALIDATED_END -->
 
 <!-- AUTO:NEXT_STEP_START -->
@@ -76,7 +76,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 ### Git hooks y calidad de código
 - [x] Agregar pre-commit hook que corra lint + typecheck + tests antes de permitir el commit (hoy solo hay post-commit).
 - [x] Integrar Husky + lint-staged para que el pre-commit solo valide archivos modificados (rápido).
-- [ ] Formalizar Conventional Commits con commitlint + generación de changelog automático.
+- [x] Formalizar Conventional Commits con commitlint + generación de changelog automático.
 - [ ] Agregar Prettier como formateador consistente (no hay config actualmente).
 
 ### Seguridad y secretos
