@@ -1,4 +1,5 @@
 import { logAuditEvent } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
 const FROM_EMAIL = process.env.BREVO_FROM_EMAIL || 'noreply@crediat.app';
@@ -6,7 +7,7 @@ const FROM_NAME = process.env.BREVO_FROM_NAME || 'Crediat';
 
 export async function sendOtpEmail(email: string, otp: string): Promise<boolean> {
   if (!BREVO_API_KEY) {
-    console.warn('BREVO_API_KEY no configurada. Simulando envío de OTP.');
+    logger.warn('BREVO_API_KEY no configurada. Simulando envío de OTP.', { email });
     return true;
   }
 
@@ -41,13 +42,16 @@ export async function sendOtpEmail(email: string, otp: string): Promise<boolean>
 
     if (!response.ok) {
       const text = await response.text();
-      console.error('Brevo error:', response.status, text);
+      logger.error('Brevo error al enviar OTP', { status: response.status, response: text, email });
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error enviando OTP por Brevo:', error);
+    logger.error('Error enviando OTP por Brevo', {
+      email,
+      error: error instanceof Error ? error.message : String(error),
+    });
     await logAuditEvent({
       eventType: 'email_failure',
       severity: 'error',
