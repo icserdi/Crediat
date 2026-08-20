@@ -1,8 +1,8 @@
-# Plan: Ciclo de Vida del Crédito
+# Ciclo de Vida del Crédito
 
 La aplicación **Crediat** gestiona todo el ciclo de vida del crédito de los clientes, desde la
-solicitud hasta la recuperación. Este documento estructura los módulos requeridos y define el
-orden lógico de implementación.
+solicitud hasta la recuperación. Este documento describe los módulos implementados, su estado
+actual y el plan de evolución.
 
 ## Visión del ciclo de vida
 
@@ -10,88 +10,123 @@ orden lógico de implementación.
 flowchart LR
     A[Solicitud] --> B[Pre-calificación]
     B --> C[Otorgamiento / Autorización]
-    C --> D[Expendiente / Vigencia]
+    C --> D[Expediente / Vigencia]
     D --> E[Seguimiento]
     E --> F[Cobranza]
     F --> G[Recuperación]
     G --> D
 ```
 
-## Módulos requeridos (mapeo al estado actual)
+## Estado de implementación
 
-| Fase | Módulo                      | Estado actual                                   | Requerido                                 |
-| ---- | --------------------------- | ----------------------------------------------- | ----------------------------------------- |
-| 1    | **Solicitud de crédito**    | ✅ Parcial (formulario + listado + RFC + MinIO) | Completar workflow de estatus             |
-| 2    | **Pre-calificación**        | ❌ No existe                                    | Nuevo                                     |
-| 3    | **Otorgamiento de crédito** | ❌ No existe                                    | Nuevo (incluye flujos de autorización)    |
-| 4    | **Gestión de expendientes** | ❌ No existe                                    | Nuevo (documentos por cliente + vigencia) |
-| 5    | **Seguimiento**             | 🟡 Parcial (bandeja/interacciones)              | Enlazar al crédito                        |
-| 6    | **Cobranza**                | 🟡 Parcial (deudores, facturas, promesas)       | Enlazar al crédito                        |
-| 7    | **Recuperación**            | 🟡 Parcial (KPIs, IA)                           | Enlazar al crédito                        |
+| Fase | Módulo                                    | Estado                                             |
+| ---- | ----------------------------------------- | -------------------------------------------------- |
+| 1    | **Workflow de Solicitud**                 | ✅ Implementado                                    |
+| 2    | **Pre-calificación**                      | ✅ Implementado                                    |
+| 3    | **Otorgamiento + Autorización**           | ✅ Implementado                                    |
+| 4    | **Expediente + Vigencia + Alertas**       | ✅ Implementado                                    |
+| 5    | **Integración (reportes)**                | ✅ Implementado                                    |
+| 6    | **Seguimiento / Cobranza / Recuperación** | 🟡 Parcial (bandeja, deudores, facturas, KPIs, IA) |
 
-## Plan de implementación por fases (orden lógico)
+## Módulos implementados
 
-### Fase 1 — Completar workflow de Solicitud
+### Fase 1 — Workflow de Solicitud ✅
 
-**Objetivo:** consolidar el módulo actual como base del ciclo.
+- Modelo de estatus con transiciones válidas:
+  `solicitud_enviada → en_revision → precalificada → aprobada | rechazada`.
+- Vista de detalle de solicitud con documentos adjuntos (MinIO).
+- Acciones por estatus (mover a siguiente etapa, rechazo con motivo obligatorio).
+- Audit trail de los cambios de estatus.
+- Endpoints: `GET/POST /api/credit/applications`, `GET/PATCH /api/credit/applications/[id]`.
 
-- [ ] Definir modelo de estatus/etapas de la solicitud (`solicitud_enviada`, `en_revision`, `precalificada`, `aprobada`, `rechazada`).
-- [ ] Vista de detalle de solicitud (`/credit/applications/[id]`) con documentos adjuntos (desde MinIO).
-- [ ] Acciones por estatus (iniciar pre-calificación, rechazar con motivo, etc.).
-- [ ] Audit trail completo de la solicitud.
+### Fase 2 — Pre-calificación ✅
 
-### Fase 2 — Pre-calificación
+- Modelo `prequalification` (score 0-100, resultado: aprobado / condicionado / rechazado).
+- Cálculo de score desde datos (RFC, ingreso, monto, antigüedad).
+- Reglas configurables vía variables de entorno (`PREQUAL_*`).
+- Integración con validación fiscal SAT (`/api/credit/rfc-validate`).
+- UI de pre-calificación en el detalle de la solicitud.
+- Endpoint: `POST /api/credit/prequalify`.
 
-**Objetivo:** evaluar de forma preliminar la viabilidad del crédito antes del otorgamiento.
+### Fase 3 — Otorgamiento de crédito con flujos de autorización ✅
 
-- [ ] Modelo `prequalification` (score preliminar, resultado: aprobado / condicionado / rechazado).
-- [ ] Cálculo de score a partir de datos (RFC vigente, historial, límites, ingresos declarados).
-- [ ] Reglas de pre-calificación configurables (montos mín/max, ratios deuda/ingreso, antigüedad).
-- [ ] Integración con validación fiscal (SAT) existente (`/api/credit/rfc-validate`).
-- [ ] UI de pre-calificación por solicitud + listado.
+- Modelo `credit_account` (monto, plazo, tasa, condiciones) y `credit_approvals`.
+- Flujo de autorización multinivel por roles y jerarquía.
+- Reglas de monto de autorización por nivel:
+  - Nivel 1: cobrador (hasta $100k)
+  - Nivel 2: supervisor (hasta $500k)
+  - Nivel 3: admin (sin límite)
+- Registro del crédito otorgado con numeración (`CR-YYYY-XXXXX`).
+- Notificaciones por email al solicitante (creación, autorización, rechazo).
+- UI: `/credit/grant`.
+- Endpoints: `POST/GET /api/credit/accounts`, `GET/POST /api/credit/accounts/[id]/approvals/[approvalId]`.
 
-### Fase 3 — Otorgamiento de crédito con flujos de autorización
+### Fase 4 — Expediente de crédito (vigencia y renovación) ✅
 
-**Objetivo:** autorizar el monto, plazo y condiciones del crédito mediante aprobaciones.
+- Modelo `expediente_documentos` con tipo, archivo (MinIO), fechas de emisión/expiración y vigencia.
+- Estados de vigencia: `vigente` / `por_vencer` / `vencido`.
+- Carga de documentos con fecha de emisión y expiración (INE, RFC, CURP, acta, estados de cuenta, etc.).
+- Alertas de vigencia configurable (`EXPEDIENTE_WARNING_DAYS`).
+- Notificaciones por email de documentos por vencer/vencidos.
+- Dashboard de alertas con enlace a renovación.
+- UI: `/credit/expedientes/[accountId]` y `/credit/alertas`.
+- Endpoints: `GET/POST /api/credit/expedientes/[accountId]`, `GET /api/credit/expedientes/alertas`.
 
-- [ ] Modelo `credit_account` / `credit_grant` (monto, plazo, tasa, condiciones).
-- [ ] Flujo de autorización multinivel (ej. cobrador → supervisor → dirección), con roles y jerarquía.
-- [ ] Tabla de `approvals` (nivel, aprobador, decisión, comentarios, fecha).
-- [ ] Reglas de monto de autorización por nivel (quién aprueba según monto).
-- [ ] Registro del crédito otorgado y generación de numeración/contrato.
-- [ ] Notificación (email) al cliente y a los aprobadores.
+### Fase 5 — Integración y reportes ✅
 
-### Fase 4 — Gestión de expendiente de crédito (vigencia y renovación)
+- Relación del crédito con el deudor SAP (CardCode).
+- KPIs del ciclo de crédito (solicitudes, pre-calificadas, autorizadas, activas, rechazadas, montos, aprobaciones pendientes, documentos por vencer).
+- Reporte del ciclo completo (solicitud → otorgado → cobrado).
+- UI: `/credit/report`.
+- Endpoint: `GET /api/credit/report`.
 
-**Objetivo:** almacenar y dar seguimiento a los documentos del cliente con crédito otorgado,
-controlando su vigencia para renovación.
+## Módulos de UI
 
-- [ ] Modelo `expediente_documento` + `expediente_vigencia`.
-- [ ] Carga de documentos (MinIO) con fecha de emisión y de expiración (INE, RFC, CURP, acta constitutiva, estados de cuenta, etc.).
-- [ ] Módulo de listado por cliente (`/credit/expedientes`) con estado del documento (vigente / por vencer / vencido).
-- [ ] **Alertas de vigencia**: notificar N días antes de la expiración (configurable) y marcar vencidos.
-- [ ] Workflow de renovación (subir documento actualizado, re-validar).
-- [ ] Dashboard de alertas (documentos por vencer/vencidos) y notificaciones (email/bandeja).
+| Módulo                  | Ruta                               | Acceso            |
+| ----------------------- | ---------------------------------- | ----------------- |
+| Solicitudes de Crédito  | `/credit/applications` (+ detalle) | Admin, Supervisor |
+| Otorgamiento de Crédito | `/credit/grant`                    | Admin, Supervisor |
+| Expediente de Crédito   | `/credit/expedientes/[accountId]`  | Admin, Supervisor |
+| Reporte de Crédito      | `/credit/report`                   | Admin, Supervisor |
+| Alertas de Expediente   | `/credit/alertas`                  | Admin, Supervisor |
+| Formulario público      | `/credit/apply`                    | Público           |
 
-### Fase 5 — Integración con el resto del ciclo
+## Persistencia
 
-**Objetivo:** enlazar el crédito otorgado con seguimiento, cobranza y recuperación.
+Tablas en PostgreSQL (creadas por `src/lib/db/index.ts`):
 
-- [ ] Relacionar el crédito con el deudor SAP (CardCode), facturas, e interacciones.
-- [ ] KPIs por crédito/cliente (saldo, pagos, morosidad).
-- [ ] Vinculación con IA (analítica, generación de mensajes de cobranza).
-- [ ] Reportes del ciclo completo (solicitud → otorgado → cobrado).
+- `credit_applications` — solicitudes de crédito.
+- `prequalifications` — resultados de pre-calificación.
+- `credit_accounts` — cuentas de crédito otorgadas.
+- `credit_approvals` — niveles de autorización.
+- `expediente_documentos` — documentos del expediente con vigencia.
 
-## Orden de prioridad recomendado
+## Notificaciones por email
 
-1. **Fase 1** (workflow de solicitud) — base de todo.
-2. **Fase 4** (expedientes + vigencia + alertas) — soporta otorgamiento y renovación.
-3. **Fase 2** (pre-calificación) — da valor previo al otorgamiento.
-4. **Fase 3** (otorgamiento + autorización) — cierra el ciclo de forma controlada.
-5. **Fase 5** (integración) — completa el panorama.
+Módulo `src/lib/notifications/email.ts` (Brevo):
 
-> **Nota de orden:** aunque la `solicitud → pre-calificación → otorgamiento` es el flujo natural,
-> se recomienda implementar la **Fase 4 (expedientes)** temprano porque los documentos ya se
-> capturan en la solicitud y la vigencia es crítica para la renovación.
-> La **Fase 3 (autorizaciones)** requiere un modelo de roles robusto que conviene asentar antes
-> de otros flujos transaccionales.
+- `notifyCreditAccountCreated` — solicitud en revisión.
+- `notifyCreditAuthorized` — crédito autorizado.
+- `notifyCreditRejected` — crédito rechazado (con motivo).
+- `notifyDocumentExpiring` — documento por vencer/vencido.
+
+> Si `BREVO_API_KEY` no está configurada, las notificaciones se simulan (retornan éxito sin enviar).
+
+## Pendientes / evolución
+
+- **Seguimiento / Cobranza / Recuperación**: enlazar el crédito otorgado con la bandeja de
+  interacciones, deudores, facturas y promesas (módulos ya existentes).
+- **Dashboard de alertas global** con notificaciones programadas (job periódico).
+- **Validación de RFC** con proveedor fiscal externo configurable (`RFC_VALIDATION_API_URL`).
+
+## Configuración relevante
+
+| Variable                                    | Uso                                        |
+| ------------------------------------------- | ------------------------------------------ |
+| `PREQUAL_MIN_SCORE`                         | Score mínimo para aprobar pre-calificación |
+| `PREQUAL_MAX_DEBT_TO_INCOME`                | Ratio máximo deuda/ingreso                 |
+| `PREQUAL_MIN_AMOUNT` / `PREQUAL_MAX_AMOUNT` | Rango de monto solicitado                  |
+| `PREQUAL_MIN_BUSINESS_AGE`                  | Antigüedad mínima del negocio (moral)      |
+| `EXPEDIENTE_WARNING_DAYS`                   | Días antes de la expiración para alertar   |
+| `RFC_VALIDATION_API_URL`                    | Proveedor de validación fiscal (opcional)  |
+| `BREVO_API_KEY`                             | Email transaccional                        |
