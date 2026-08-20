@@ -24,7 +24,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { RefreshCw, Building2, Plus, CheckCircle2, XCircle } from 'lucide-react';
+import { RefreshCw, Building2, Plus, CheckCircle2, XCircle, FolderOpen } from 'lucide-react';
+import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useCreditAccounts } from '@/hooks/use-credit-accounts';
 import { PageHeader } from '@/components/shared/page-header';
@@ -186,9 +187,16 @@ export default function CreditGrantPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="outline" size="sm" onClick={() => openApprovals(acc)}>
-                          Ver aprobaciones
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          <Link href={`/credit/expedientes/${acc.id}`}>
+                            <Button variant="outline" size="sm" className="gap-1">
+                              <FolderOpen className="w-4 h-4" /> Expediente
+                            </Button>
+                          </Link>
+                          <Button variant="outline" size="sm" onClick={() => openApprovals(acc)}>
+                            Ver aprobaciones
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

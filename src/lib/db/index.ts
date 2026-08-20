@@ -143,12 +143,32 @@ export async function initializeDb(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_credit_approvals_account ON credit_approvals(credit_account_id);
   `;
 
+  const createExpediente = `
+    CREATE TABLE IF NOT EXISTS expediente_documentos (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      credit_account_id UUID NOT NULL REFERENCES credit_accounts(id) ON DELETE CASCADE,
+      document_type VARCHAR(40) NOT NULL,
+      file_name VARCHAR(255) NOT NULL,
+      file_key VARCHAR(500) NOT NULL,
+      issued_at DATE NOT NULL,
+      expires_at DATE NOT NULL,
+      validity VARCHAR(20) NOT NULL DEFAULT 'vigente'
+        CHECK (validity IN ('vigente', 'por_vencer', 'vencido')),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_expediente_account ON expediente_documentos(credit_account_id);
+    CREATE INDEX IF NOT EXISTS idx_expediente_expires ON expediente_documentos(expires_at);
+  `;
+
   await query(createInteractions);
   await query(createAuditLogs);
   await query(createCreditApplications);
   await query(createPrequalifications);
   await query(createCreditAccounts);
   await query(createCreditApprovals);
+  await query(createExpediente);
 }
 
 export async function logAuditEvent(params: {

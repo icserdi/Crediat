@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-19T23:44:09.251Z
+- Última validación automática: 2026-08-20T00:20:54.394Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -154,11 +154,11 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 ### Fase 4 — Gestión de expendiente de crédito (vigencia y renovación)
 
-- [ ] Modelos `expediente_documento` + `expediente_vigencia`.
-- [ ] Carga de documentos (MinIO) con fechas de emisión y expiración (INE, RFC, CURP, acta, estados de cuenta).
-- [ ] Módulo de listado por cliente `/credit/expedientes` con estado del documento (vigente / por vencer / vencido).
-- [ ] Alertas de vigencia: notificar N días antes de expirar (configurable) y marcar vencidos.
-- [ ] Workflow de renovación (subir documento actualizado, re-validar).
+- [x] Modelos `expediente_documento` + `expediente_vigencia`.
+- [x] Carga de documentos (MinIO) con fechas de emisión y expiración (INE, RFC, CURP, acta, estados de cuenta).
+- [x] Módulo de listado por cliente `/credit/expedientes/[accountId]` con estado del documento (vigente / por vencer / vencido).
+- [x] Alertas de vigencia: notificar N días antes de expirar (configurable) y marcar vencidos.
+- [x] Workflow de renovación (subir documento actualizado, re-validar).
 - [ ] Dashboard de alertas (por vencer/vencidos) + notificaciones.
 
 ### Fase 5 — Integración con el resto del ciclo
