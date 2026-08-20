@@ -15,6 +15,8 @@ export type ApprovalDecision = 'aprobado' | 'rechazado';
 /** Datos para otorgar un crédito. */
 export type CreditGrantInput = {
   applicationId: string;
+  /** CardCode del deudor en SAP (para relacionar el crédito con la cartera). */
+  cardCode?: string;
   requestedAmount: number;
   termMonths: number;
   interestRate: number;
@@ -25,6 +27,7 @@ export type CreditAccount = {
   id: string;
   applicationId: string;
   accountNumber: string;
+  cardCode: string | null;
   requestedAmount: number;
   approvedAmount: number | null;
   termMonths: number;
@@ -94,15 +97,16 @@ export async function createCreditAccount(input: CreditGrantInput): Promise<Cred
 
   const rows = await query<CreditAccount>(
     `INSERT INTO credit_accounts
-       (application_id, account_number, requested_amount, term_months, interest_rate, conditions, status)
-     VALUES ($1, $2, $3, $4, $5, $6, 'pendiente_autorizacion')
+       (application_id, account_number, card_code, requested_amount, term_months, interest_rate, conditions, status)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente_autorizacion')
      RETURNING id, application_id AS "applicationId", account_number AS "accountNumber",
-               requested_amount AS "requestedAmount", approved_amount AS "approvedAmount",
+               card_code AS "cardCode", requested_amount AS "requestedAmount", approved_amount AS "approvedAmount",
                term_months AS "termMonths", interest_rate AS "interestRate", conditions,
                status, created_at AS "createdAt", updated_at AS "updatedAt"`,
     [
       input.applicationId,
       accountNumber,
+      input.cardCode || null,
       input.requestedAmount,
       input.termMonths,
       input.interestRate,
@@ -222,7 +226,7 @@ export async function decideApproval(
 export async function getCreditAccount(id: string): Promise<CreditAccount | null> {
   const rows = await query<CreditAccount>(
     `SELECT id, application_id AS "applicationId", account_number AS "accountNumber",
-            requested_amount AS "requestedAmount", approved_amount AS "approvedAmount",
+            card_code AS "cardCode", requested_amount AS "requestedAmount", approved_amount AS "approvedAmount",
             term_months AS "termMonths", interest_rate AS "interestRate", conditions,
             status, created_at AS "createdAt", updated_at AS "updatedAt"
      FROM credit_accounts WHERE id = $1`,
@@ -235,7 +239,7 @@ export async function getCreditAccount(id: string): Promise<CreditAccount | null
 export async function listCreditAccounts(limit = 100): Promise<CreditAccount[]> {
   return query<CreditAccount>(
     `SELECT id, application_id AS "applicationId", account_number AS "accountNumber",
-            requested_amount AS "requestedAmount", approved_amount AS "approvedAmount",
+            card_code AS "cardCode", requested_amount AS "requestedAmount", approved_amount AS "approvedAmount",
             term_months AS "termMonths", interest_rate AS "interestRate", conditions,
             status, created_at AS "createdAt", updated_at AS "updatedAt"
      FROM credit_accounts

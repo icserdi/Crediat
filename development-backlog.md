@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-20T00:20:54.394Z
+- Última validación automática: 2026-08-20T00:29:28.390Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -163,10 +163,11 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 ### Fase 5 — Integración con el resto del ciclo
 
-- [ ] Relacionar crédito con deudor SAP (CardCode), facturas e interacciones.
-- [ ] KPIs por crédito/cliente (saldo, pagos, morosidad).
-- [ ] Vinculación con IA (analítica, mensajes de cobranza).
-- [ ] Reportes del ciclo completo (solicitud → otorgado → cobrado).
+- [x] Relacionar crédito con deudor SAP (CardCode), facturas e interacciones.
+- [x] KPIs por crédito/cliente (saldo, pagos, morosidad).
+- [x] Vinculación con IA (analítica, mensajes de cobranza).
+- [x] Reportes del ciclo completo (solicitud → otorgado → cobrado).
+- [x] Endpoint `/api/credit/report` + página `/credit/report` + sidebar.
 
 ## Post-MVP — Funcionalidades a evaluar
 

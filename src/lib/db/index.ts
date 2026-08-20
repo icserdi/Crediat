@@ -113,6 +113,7 @@ export async function initializeDb(): Promise<void> {
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       application_id UUID NOT NULL REFERENCES credit_applications(id) ON DELETE CASCADE,
       account_number VARCHAR(30) NOT NULL UNIQUE,
+      card_code VARCHAR(50),
       requested_amount NUMERIC(15,2) NOT NULL,
       approved_amount NUMERIC(15,2),
       term_months INTEGER NOT NULL,
@@ -125,6 +126,8 @@ export async function initializeDb(): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_credit_accounts_application ON credit_accounts(application_id);
     CREATE INDEX IF NOT EXISTS idx_credit_accounts_status ON credit_accounts(status);
+
+    ALTER TABLE credit_accounts ADD COLUMN IF NOT EXISTS card_code VARCHAR(50);
   `;
 
   const createCreditApprovals = `

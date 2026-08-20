@@ -13,6 +13,7 @@ import {
   Building2,
   CreditCard,
   HandCoins,
+  BarChart3,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -47,6 +48,12 @@ const navItems = [
     icon: HandCoins,
     label: 'Otorgamiento de Crédito',
     href: '/credit/grant',
+    roles: ['admin', 'supervisor'],
+  },
+  {
+    icon: BarChart3,
+    label: 'Reporte de Crédito',
+    href: '/credit/report',
     roles: ['admin', 'supervisor'],
   },
   {
