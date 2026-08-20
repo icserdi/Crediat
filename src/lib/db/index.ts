@@ -108,10 +108,47 @@ export async function initializeDb(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_prequalifications_application ON prequalifications(application_id);
   `;
 
+  const createCreditAccounts = `
+    CREATE TABLE IF NOT EXISTS credit_accounts (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      application_id UUID NOT NULL REFERENCES credit_applications(id) ON DELETE CASCADE,
+      account_number VARCHAR(30) NOT NULL UNIQUE,
+      requested_amount NUMERIC(15,2) NOT NULL,
+      approved_amount NUMERIC(15,2),
+      term_months INTEGER NOT NULL,
+      interest_rate NUMERIC(6,3) NOT NULL,
+      conditions TEXT,
+      status VARCHAR(30) NOT NULL DEFAULT 'pendiente_autorizacion',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_credit_accounts_application ON credit_accounts(application_id);
+    CREATE INDEX IF NOT EXISTS idx_credit_accounts_status ON credit_accounts(status);
+  `;
+
+  const createCreditApprovals = `
+    CREATE TABLE IF NOT EXISTS credit_approvals (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      credit_account_id UUID NOT NULL REFERENCES credit_accounts(id) ON DELETE CASCADE,
+      level INTEGER NOT NULL,
+      role VARCHAR(20) NOT NULL,
+      approved_by VARCHAR(200),
+      decision VARCHAR(20) CHECK (decision IN ('aprobado', 'rechazado')),
+      comments TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      decided_at TIMESTAMPTZ
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_credit_approvals_account ON credit_approvals(credit_account_id);
+  `;
+
   await query(createInteractions);
   await query(createAuditLogs);
   await query(createCreditApplications);
   await query(createPrequalifications);
+  await query(createCreditAccounts);
+  await query(createCreditApprovals);
 }
 
 export async function logAuditEvent(params: {
