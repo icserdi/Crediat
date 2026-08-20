@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { listExpiringDocuments, refreshValidity } from '@/lib/credit/expediente';
+import { listExpiringDocumentsWithDetails, refreshValidity } from '@/lib/credit/expediente';
 import { initializeDb } from '@/lib/db';
 
 let dbInitialized = false;
@@ -16,7 +16,7 @@ export async function GET() {
   try {
     await ensureDb();
     await refreshValidity();
-    const documentos = await listExpiringDocuments();
+    const documentos = await listExpiringDocumentsWithDetails();
     return NextResponse.json({ documentos });
   } catch (error) {
     return NextResponse.json(

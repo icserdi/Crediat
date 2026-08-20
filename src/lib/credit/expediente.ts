@@ -164,6 +164,29 @@ export async function listExpiringDocuments(): Promise<ExpedienteDocumento[]> {
   );
 }
 
+/** Alerta de expediente con información del solicitante y cuenta. */
+export type ExpedienteAlerta = ExpedienteDocumento & {
+  applicantName: string;
+  accountNumber: string;
+};
+
+/** Lista alertas (por vencer/vencidos) con datos del solicitante y la cuenta. */
+export async function listExpiringDocumentsWithDetails(): Promise<ExpedienteAlerta[]> {
+  const warningDays = getExpiryWarningDays();
+  return query<ExpedienteAlerta>(
+    `SELECT ed.id, ed.credit_account_id AS "creditAccountId", ed.document_type AS "documentType",
+            ed.file_name AS "fileName", ed.file_key AS "fileKey", ed.issued_at AS "issuedAt",
+            ed.expires_at AS "expiresAt", ed.validity, ed.created_at AS "createdAt", ed.updated_at AS "updatedAt",
+            ca2.full_name AS "applicantName", ca.account_number AS "accountNumber"
+     FROM expediente_documentos ed
+     JOIN credit_accounts ca ON ca.id = ed.credit_account_id
+     JOIN credit_applications ca2 ON ca2.id = ca.application_id
+     WHERE ed.expires_at <= NOW() + ($1 || ' days')::interval
+     ORDER BY ed.expires_at ASC`,
+    [warningDays]
+  );
+}
+
 /** Marca los documentos vencidos (mantiene la vigencia actualizada). */
 export async function refreshValidity(): Promise<void> {
   await query(

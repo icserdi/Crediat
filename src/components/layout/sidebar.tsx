@@ -14,6 +14,7 @@ import {
   CreditCard,
   HandCoins,
   BarChart3,
+  BellRing,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -54,6 +55,12 @@ const navItems = [
     icon: BarChart3,
     label: 'Reporte de Crédito',
     href: '/credit/report',
+    roles: ['admin', 'supervisor'],
+  },
+  {
+    icon: BellRing,
+    label: 'Alertas de Expediente',
+    href: '/credit/alertas',
     roles: ['admin', 'supervisor'],
   },
   {

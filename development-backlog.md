@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-20T00:54:29.040Z
+- Última validación automática: 2026-08-20T01:06:50.780Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -160,7 +160,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [x] Alertas de vigencia: notificar N días antes de expirar (configurable) y marcar vencidos.
 - [x] Workflow de renovación (subir documento actualizado, re-validar).
 - [x] Notificaciones de vigencia por email (documento por vencer/vencido).
-- [ ] Dashboard de alertas (por vencer/vencidos) + notificaciones.
+- [x] Dashboard de alertas `/credit/alertas` (por vencer/vencidos) con enlace a renovación.
 
 ### Fase 5 — Integración con el resto del ciclo
 
