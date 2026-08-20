@@ -3,6 +3,19 @@
 import { query } from '@/lib/db';
 import { logAuditEvent } from '@/lib/db';
 import { uploadFile } from '@/lib/storage/minio';
+import { notifyDocumentExpiring } from '@/lib/notifications/email';
+
+/** Obtiene el email del solicitante de una cuenta de crédito. */
+async function getAccountApplicantEmail(creditAccountId: string): Promise<string | null> {
+  const rows = await query<{ email: string }>(
+    `SELECT ca2.email
+     FROM credit_accounts ca
+     JOIN credit_applications ca2 ON ca2.id = ca.application_id
+     WHERE ca.id = $1`,
+    [creditAccountId]
+  );
+  return rows[0]?.email || null;
+}
 
 /** Estado de vigencia de un documento. */
 export type DocumentValidity = 'vigente' | 'por_vencer' | 'vencido';
@@ -108,6 +121,18 @@ export async function addExpedienteDocumento(input: {
     description: `Documento ${DOCUMENT_TYPE_LABELS[input.documentType]} agregado al expediente.`,
     metadata: { documentType: input.documentType, expiresAt: input.expiresAt },
   });
+
+  // Notificar si el documento está por vencer o vencido
+  if (validity !== 'vigente') {
+    const applicantEmail = await getAccountApplicantEmail(input.creditAccountId);
+    if (applicantEmail) {
+      await notifyDocumentExpiring({
+        to: applicantEmail,
+        documentName: DOCUMENT_TYPE_LABELS[input.documentType],
+        expiresAt: input.expiresAt,
+      });
+    }
+  }
 
   return doc;
 }

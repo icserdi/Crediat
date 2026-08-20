@@ -4,7 +4,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 
 <!-- AUTO:LAST_VALIDATED_START -->
 
-- Última validación automática: 2026-08-20T00:29:28.390Z
+- Última validación automática: 2026-08-20T00:54:29.040Z
 
 <!-- AUTO:LAST_VALIDATED_END -->
 
@@ -149,7 +149,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [x] Tabla `approvals` (nivel, aprobador, decisión, comentarios, fecha).
 - [x] Reglas de monto de autorización por nivel.
 - [x] Registro del crédito otorgado (numeración/contrato).
-- [ ] Notificación (email) a cliente y aprobadores.
+- [x] Notificación (email) a cliente y aprobadores.
 - [x] UI de otorgamiento `/credit/grant` + endpoints API + tests.
 
 ### Fase 4 — Gestión de expendiente de crédito (vigencia y renovación)
@@ -159,6 +159,7 @@ Seguimiento operativo del avance de desarrollo contra `roadmap.md`, con foco en 
 - [x] Módulo de listado por cliente `/credit/expedientes/[accountId]` con estado del documento (vigente / por vencer / vencido).
 - [x] Alertas de vigencia: notificar N días antes de expirar (configurable) y marcar vencidos.
 - [x] Workflow de renovación (subir documento actualizado, re-validar).
+- [x] Notificaciones de vigencia por email (documento por vencer/vencido).
 - [ ] Dashboard de alertas (por vencer/vencidos) + notificaciones.
 
 ### Fase 5 — Integración con el resto del ciclo

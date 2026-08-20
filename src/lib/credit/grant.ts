@@ -2,6 +2,20 @@
 
 import { query } from '@/lib/db';
 import { logAuditEvent } from '@/lib/db';
+import {
+  notifyCreditAccountCreated,
+  notifyCreditAuthorized,
+  notifyCreditRejected,
+} from '@/lib/notifications/email';
+
+/** Obtiene el email del solicitante de una solicitud de crédito. */
+async function getApplicantEmail(applicationId: string): Promise<string | null> {
+  const rows = await query<{ email: string }>(
+    `SELECT email FROM credit_applications WHERE id = $1`,
+    [applicationId]
+  );
+  return rows[0]?.email || null;
+}
 
 /** Roles que participan en la autorización de crédito. */
 export type ApprovalRole = 'cobrador' | 'supervisor' | 'admin';
@@ -136,6 +150,16 @@ export async function createCreditAccount(input: CreditGrantInput): Promise<Cred
     metadata: { applicationId: input.applicationId, requestedAmount: input.requestedAmount },
   });
 
+  // Notificar al solicitante
+  const applicantEmail = await getApplicantEmail(input.applicationId);
+  if (applicantEmail) {
+    await notifyCreditAccountCreated({
+      to: applicantEmail,
+      accountNumber,
+      requestedAmount: input.requestedAmount,
+    });
+  }
+
   return account;
 }
 
@@ -189,6 +213,16 @@ export async function decideApproval(
       metadata: { comments },
     });
     const account = await getCreditAccount(accountId);
+    if (account) {
+      const applicantEmail = await getApplicantEmail(account.applicationId);
+      if (applicantEmail) {
+        await notifyCreditRejected({
+          to: applicantEmail,
+          accountNumber: account.accountNumber,
+          reason: comments || undefined,
+        });
+      }
+    }
     return { account: account!, allApproved: false };
   }
 
@@ -216,6 +250,18 @@ export async function decideApproval(
       description: `Crédito autorizado por ${approvedBy}.`,
       metadata: { comments },
     });
+
+    const account = await getCreditAccount(accountId);
+    if (account) {
+      const applicantEmail = await getApplicantEmail(account.applicationId);
+      if (applicantEmail && account.approvedAmount) {
+        await notifyCreditAuthorized({
+          to: applicantEmail,
+          accountNumber: account.accountNumber,
+          approvedAmount: account.approvedAmount,
+        });
+      }
+    }
   }
 
   const account = await getCreditAccount(accountId);
