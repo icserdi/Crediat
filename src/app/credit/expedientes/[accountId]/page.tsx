@@ -27,7 +27,7 @@ import { ArrowLeft, FileText, Plus, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useExpediente } from '@/hooks/use-expediente';
-import { DOCUMENT_TYPE_LABELS, type DocumentType } from '@/lib/credit/expediente';
+import { DOCUMENT_TYPE_LABELS, type DocumentType } from '@/lib/credit/expediente-types';
 
 const validityBadge: Record<string, { label: string; className: string }> = {
   vigente: { label: 'Vigente', className: 'bg-green-50 text-green-700 border-green-200' },

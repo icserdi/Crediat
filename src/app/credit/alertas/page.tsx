@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { useExpediente } from '@/hooks/use-expediente';
 import { PageHeader } from '@/components/shared/page-header';
 import { StatCard } from '@/components/shared/stat-card';
-import { DOCUMENT_TYPE_LABELS } from '@/lib/credit/expediente';
+import { DOCUMENT_TYPE_LABELS } from '@/lib/credit/expediente-types';
 
 const validityBadge: Record<string, { label: string; className: string }> = {
   por_vencer: { label: 'Por vencer', className: 'bg-orange-50 text-orange-700 border-orange-200' },

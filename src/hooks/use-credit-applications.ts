@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import type { CreditApplication, CreditApplicationInput } from '@/lib/credit/application';
+import type { CreditApplication, CreditApplicationInput } from '@/lib/credit/constants';
 
 /**
  * Hook que encapsula la carga y creación de solicitudes de crédito.

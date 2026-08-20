@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useCreditApplications } from '@/hooks/use-credit-applications';
-import { REQUIRED_DOCUMENTS, type PersonType } from '@/lib/credit/application';
+import { REQUIRED_DOCUMENTS, type PersonType } from '@/lib/credit/constants';
 import { CheckCircle2, FileText, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

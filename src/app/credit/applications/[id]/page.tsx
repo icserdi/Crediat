@@ -13,11 +13,7 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useCreditApplications } from '@/hooks/use-credit-applications';
 import { usePrequalification } from '@/hooks/use-prequalification';
-import {
-  STATUS_LABELS,
-  STATUS_TRANSITIONS,
-  type CreditApplication,
-} from '@/lib/credit/application';
+import { STATUS_LABELS, STATUS_TRANSITIONS, type CreditApplication } from '@/lib/credit/constants';
 
 const statusBadgeClass: Record<string, string> = {
   solicitud_enviada: 'bg-blue-50 text-blue-700 border-blue-200',

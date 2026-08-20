@@ -1,7 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import type { ExpedienteDocumento, ExpedienteAlerta, DocumentType } from '@/lib/credit/expediente';
+import type {
+  ExpedienteDocumento,
+  ExpedienteAlerta,
+  DocumentType,
+} from '@/lib/credit/expediente-types';
 
 /**
  * Hook que encapsula la gestión del expediente de crédito (documentos y alertas).

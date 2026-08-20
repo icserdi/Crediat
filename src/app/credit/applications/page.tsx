@@ -16,7 +16,7 @@ import { RefreshCw, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { useCreditApplications } from '@/hooks/use-credit-applications';
 import { PageHeader } from '@/components/shared/page-header';
-import { STATUS_LABELS, type CreditApplicationStatus } from '@/lib/credit/application';
+import { STATUS_LABELS, type CreditApplicationStatus } from '@/lib/credit/constants';
 
 const statusConfig: Record<CreditApplicationStatus, { label: string; className: string }> = {
   solicitud_enviada: {

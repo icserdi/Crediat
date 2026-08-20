@@ -4,6 +4,24 @@ import { query } from '@/lib/db';
 import { logAuditEvent } from '@/lib/db';
 import { uploadFile } from '@/lib/storage/minio';
 import { notifyDocumentExpiring } from '@/lib/notifications/email';
+import {
+  computeValidity,
+  getExpiryWarningDays,
+  DOCUMENT_TYPE_LABELS,
+  type DocumentType,
+  type ExpedienteAlerta,
+  type ExpedienteDocumento,
+} from './expediente-types';
+
+export {
+  type DocumentValidity,
+  type DocumentType,
+  type ExpedienteDocumento,
+  type ExpedienteAlerta,
+  getExpiryWarningDays,
+  computeValidity,
+  DOCUMENT_TYPE_LABELS,
+} from './expediente-types';
 
 /** Obtiene el email del solicitante de una cuenta de crédito. */
 async function getAccountApplicantEmail(creditAccountId: string): Promise<string | null> {
@@ -16,65 +34,6 @@ async function getAccountApplicantEmail(creditAccountId: string): Promise<string
   );
   return rows[0]?.email || null;
 }
-
-/** Estado de vigencia de un documento. */
-export type DocumentValidity = 'vigente' | 'por_vencer' | 'vencido';
-
-/** Tipos de documento del expediente de crédito. */
-export type DocumentType =
-  | 'ine'
-  | 'curp'
-  | 'rfc'
-  | 'acta_constitutiva'
-  | 'comprobante_domicilio'
-  | 'situacion_fiscal'
-  | 'declaracion'
-  | 'estados_cuenta'
-  | 'aviso_privacidad'
-  | 'otro';
-
-export type ExpedienteDocumento = {
-  id: string;
-  creditAccountId: string;
-  documentType: DocumentType;
-  fileName: string;
-  fileKey: string;
-  issuedAt: string;
-  expiresAt: string;
-  validity: DocumentValidity;
-  createdAt: string;
-  updatedAt: string;
-};
-
-/** Días antes de la expiración para marcar "por vencer". */
-export function getExpiryWarningDays(): number {
-  return parseInt(process.env.EXPEDIENTE_WARNING_DAYS || '30', 10);
-}
-
-/** Determina la vigencia de un documento según su fecha de expiración. */
-export function computeValidity(expiresAt: string): DocumentValidity {
-  const now = Date.now();
-  const expiry = new Date(expiresAt).getTime();
-  const warningMs = getExpiryWarningDays() * 24 * 60 * 60 * 1000;
-
-  if (expiry < now) return 'vencido';
-  if (expiry - now <= warningMs) return 'por_vencer';
-  return 'vigente';
-}
-
-/** Tipos de documento con descripción. */
-export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
-  ine: 'Identificación oficial (INE)',
-  curp: 'CURP',
-  rfc: 'Situación fiscal / RFC',
-  acta_constitutiva: 'Acta constitutiva',
-  comprobante_domicilio: 'Comprobante de domicilio',
-  situacion_fiscal: 'Situación fiscal SAT',
-  declaracion: 'Declaración anual',
-  estados_cuenta: 'Estados de cuenta',
-  aviso_privacidad: 'Aviso de privacidad',
-  otro: 'Otro',
-};
 
 /** Registra un documento del expediente y lo sube a MinIO. */
 export async function addExpedienteDocumento(input: {
@@ -163,12 +122,6 @@ export async function listExpiringDocuments(): Promise<ExpedienteDocumento[]> {
     [warningDays]
   );
 }
-
-/** Alerta de expediente con información del solicitante y cuenta. */
-export type ExpedienteAlerta = ExpedienteDocumento & {
-  applicantName: string;
-  accountNumber: string;
-};
 
 /** Lista alertas (por vencer/vencidos) con datos del solicitante y la cuenta. */
 export async function listExpiringDocumentsWithDetails(): Promise<ExpedienteAlerta[]> {
